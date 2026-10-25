@@ -1,0 +1,374 @@
+{#
+    Vista: presupuestos_detalle/new.html.twig
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Agregar Productos al Presupuesto{% endblock %}
+
+{% block body %}
+
+    <div class="mx-auto" style="max-width: 1200px;">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h1 class="display-6 fw-light text-dark mb-1" style="letter-spacing: -1px;">
+                    Agregar Productos
+                </h1>
+                <p class="text-secondary mb-0">
+                    Seleccione un presupuesto y agregue productos
+                </p>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_presupuestos_detalle_index') }}" class="btn btn-outline-dark rounded-0 px-4 py-2">
+                    Volver
+                </a>
+            </div>
+
+        </div>
+
+        <div class="card border-0 rounded-0 shadow-sm">
+
+            <div class="card-body p-4">
+
+                {# Selector de presupuesto #}
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark small text-uppercase">
+                        Presupuesto
+                    </label>
+                    <select name="presupuesto_id" id="presupuesto_id" class="form-select form-select-lg rounded-0 border-secondary shadow-none">
+                        <option value="">Seleccione un presupuesto</option>
+                        {% for p in presupuestos %}
+                            <option value="{{ p.id }}" {{ presupuesto_seleccionado and presupuesto_seleccionado.id == p.id ? 'selected' : '' }}>
+                                #{{ p.id }} - {{ p.clienteNombre }} ({{ p.fecha|date('d/m/Y') }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                {# Tabla de productos agregados #}
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label fw-semibold text-dark small text-uppercase mb-0">
+                            Productos
+                        </label>
+                        <button type="button" class="btn btn-dark rounded-0 btn-sm" data-bs-toggle="modal" data-bs-target="#productosModal">
+                            <i class="bi bi-plus-lg"></i> Agregar Producto
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle" id="productosTabla">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="text-black fw-normal p-2">Producto</th>
+                                    <th class="text-black fw-normal p-2" style="width: 120px;">Cantidad</th>
+                                    <th class="text-black fw-normal p-2" style="width: 150px;">Precio Unit.</th>
+                                    <th class="text-black fw-normal p-2" style="width: 150px;">Subtotal</th>
+                                    <th class="text-black fw-normal p-2" style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="detallesBody">
+                                <tr class="text-center">
+                                    <td colspan="5" class="text-secondary">No hay productos agregados</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="3" class="text-end">TOTAL:</td>
+                                    <td colspan="2" id="totalGeneral">$0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                {# Botones de acción #}
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <a href="{{ path('app_presupuestos_detalle_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+                        Cancelar
+                    </a>
+                    <button type="button" class="btn btn-dark rounded-0 px-5 py-2" id="btnGuardar">
+                        Guardar todos los productos
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {# Modal para seleccionar productos #}
+    <div class="modal fade" id="productosModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title">Seleccionar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="buscarProducto" class="form-control rounded-0 mb-3" placeholder="Buscar producto...">
+                    <div id="tablaProductosContainer">Cargando productos...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .pagination-nav { display: flex; justify-content: center; margin-top: 1rem; }
+        .pagination-nav .btn { margin: 0 2px; }
+    </style>
+
+<script>
+    let productosSeleccionados = [];
+
+    function mostrarMensaje(mensaje, tipo = 'success') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${tipo} alert-dismissible fade show position-fixed top-0 end-0 m-3`;
+        alertDiv.style.zIndex = '9999';
+        alertDiv.innerHTML = `
+            ${mensaje}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alertDiv);
+        setTimeout(() => alertDiv.remove(), 2000);
+    }
+
+    function actualizarTabla() {
+        const tbody = document.getElementById('detallesBody');
+        let total = 0;
+
+        if (productosSeleccionados.length === 0) {
+            tbody.innerHTML = '<tr class="text-center"><td colspan="5" class="text-secondary">No hay productos agregados</td></tr>';
+            document.getElementById('totalGeneral').innerText = '$0.00';
+            return;
+        }
+
+        tbody.innerHTML = '';
+        productosSeleccionados.forEach((item, idx) => {
+            const subtotal = item.cantidad * item.precio;
+            total += subtotal;
+
+            const row = `
+                <tr>
+                    <td>${item.nombre}</td>
+                    <td><input type="number" class="form-control form-control-sm cantidad" data-idx="${idx}" value="${item.cantidad}" step="0.001" style="width: 100px;"></td>
+                    <td><input type="number" class="form-control form-control-sm precio" data-idx="${idx}" value="${item.precio}" step="0.01" style="width: 120px;"></td>
+                    <td>$${subtotal.toFixed(2)}</td>
+                    <td class="text-center"><button class="btn btn-sm btn-danger rounded-0 eliminar" data-idx="${idx}"><i class="bi bi-trash"></i></button></td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+
+        document.getElementById('totalGeneral').innerText = `$${total.toFixed(2)}`;
+
+        document.querySelectorAll('.cantidad').forEach(input => {
+            input.addEventListener('change', function() {
+                const idx = this.dataset.idx;
+                const nuevaCantidad = parseFloat(this.value);
+                if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+                    productosSeleccionados[idx].cantidad = nuevaCantidad;
+                    actualizarTabla();
+                }
+            });
+        });
+
+        document.querySelectorAll('.precio').forEach(input => {
+            input.addEventListener('change', function() {
+                const idx = this.dataset.idx;
+                const nuevoPrecio = parseFloat(this.value);
+                if (!isNaN(nuevoPrecio) && nuevoPrecio > 0) {
+                    productosSeleccionados[idx].precio = nuevoPrecio;
+                    actualizarTabla();
+                }
+            });
+        });
+
+        document.querySelectorAll('.eliminar').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const idx = parseInt(this.dataset.idx);
+                productosSeleccionados.splice(idx, 1);
+                actualizarTabla();
+                mostrarMensaje('Producto eliminado', 'warning');
+            });
+        });
+    }
+
+    function cargarProductos(page, search) {
+        const container = document.getElementById('tablaProductosContainer');
+        container.innerHTML = 'Cargando...';
+
+        fetch(`/api/productos/buscar?page=${page}&search=${encodeURIComponent(search)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.items || data.items.length === 0) {
+                    container.innerHTML = '<p class="text-center">No hay productos</p>';
+                    return;
+                }
+
+                let html = '<table class="table table-sm">';
+                html += '<thead><tr><th>Producto</th><th>Precio</th><th>Stock</th><th></th></tr></thead><tbody>';
+                data.items.forEach(p => {
+                    const yaAgregado = productosSeleccionados.some(item => item.id === p.id);
+                    html += `
+                        <tr>
+                            <td>${p.nombre}</td>
+                            <td>$${parseFloat(p.precio).toFixed(2)}</td>
+                            <td>${p.stock}</td>
+                            <td>
+                                <button class="btn btn-sm btn-dark rounded-0 seleccionar"
+                                        data-id="${p.id}"
+                                        data-nombre="${p.nombre}"
+                                        data-precio="${p.precio}"
+                                        ${yaAgregado ? 'disabled style="opacity:0.5;"' : ''}>
+                                    ${yaAgregado ? '✓ Agregado' : 'Agregar'}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                html += '</tbody></table>';
+
+               // Paginación con límite de 3 botones
+let pagination = '<div class="pagination-nav">';
+
+// Botón "Anterior"
+if (data.page > 1) {
+    pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="${data.page - 1}">&laquo;</button>`;
+}
+
+// Calcular rango de páginas
+let startPage = data.page - 1;
+let endPage = data.page + 1;
+
+if (startPage < 1) {
+    startPage = 1;
+    endPage = Math.min(3, data.pageCount);
+}
+
+if (endPage > data.pageCount) {
+    endPage = data.pageCount;
+    startPage = Math.max(1, data.pageCount - 2);
+}
+
+// Mostrar primera página si no está en el rango
+if (startPage > 1) {
+    pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="1">1</button>`;
+    if (startPage > 2) pagination += `<span class="mx-1">...</span>`;
+}
+
+// Botones de páginas
+for (let i = startPage; i <= endPage; i++) {
+    pagination += `<button class="btn btn-sm ${i === data.page ? 'btn-dark' : 'btn-outline-secondary'} rounded-0 page-btn" data-page="${i}">${i}</button>`;
+}
+
+// Mostrar última página si no está en el rango
+if (endPage < data.pageCount) {
+    if (endPage < data.pageCount - 1) pagination += `<span class="mx-1">...</span>`;
+    pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="${data.pageCount}">${data.pageCount}</button>`;
+}
+
+// Botón "Siguiente"
+if (data.page < data.pageCount) {
+    pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="${data.page + 1}">&raquo;</button>`;
+}
+
+pagination += '</div>';
+
+
+
+                container.innerHTML = html + pagination;
+
+                document.querySelectorAll('.page-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const searchValue = document.getElementById('buscarProducto').value;
+                        cargarProductos(parseInt(this.dataset.page), searchValue);
+                    });
+                });
+
+                document.querySelectorAll('.seleccionar:not([disabled])').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        const nombre = this.dataset.nombre;
+                        const precio = parseFloat(this.dataset.precio);
+
+                        const existe = productosSeleccionados.some(p => p.id === id);
+                        if (!existe) {
+                            productosSeleccionados.push({
+                                id: id,
+                                nombre: nombre,
+                                precio: precio,
+                                cantidad: 1
+                            });
+                            actualizarTabla();
+                            mostrarMensaje(`${nombre} agregado al presupuesto`, 'success');
+
+                            // Resetear búsqueda y recargar tabla
+                            document.getElementById('buscarProducto').value = '';
+                            cargarProductos(1, '');
+                        }
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                container.innerHTML = '<p class="text-center text-danger">Error al cargar productos</p>';
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const modalElement = document.getElementById('productosModal');
+
+        modalElement.addEventListener('show.bs.modal', function() {
+            // Resetear búsqueda al abrir el modal
+            document.getElementById('buscarProducto').value = '';
+            cargarProductos(1, '');
+        });
+
+        document.getElementById('buscarProducto').addEventListener('input', function() {
+            cargarProductos(1, this.value);
+        });
+
+        document.getElementById('btnGuardar').addEventListener('click', function() {
+            const presupuestoId = document.getElementById('presupuesto_id').value;
+            if (!presupuestoId) {
+                mostrarMensaje('Seleccione un presupuesto', 'danger');
+                return;
+            }
+            if (productosSeleccionados.length === 0) {
+                mostrarMensaje('Agregue al menos un producto', 'warning');
+                return;
+            }
+
+            fetch('{{ path('app_presupuestos_detalle_save') }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    presupuesto_id: presupuestoId,
+                    productos: productosSeleccionados
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    mostrarMensaje('Productos guardados correctamente', 'success');
+                    setTimeout(() => {
+                        window.location.href = '{{ path('app_presupuestos_detalle_index') }}';
+                    }, 1000);
+                } else {
+                    mostrarMensaje('Error: ' + data.message, 'danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarMensaje('Error al guardar', 'danger');
+            });
+        });
+    });
+</script>
+
+{% endblock %}

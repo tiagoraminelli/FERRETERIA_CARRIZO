@@ -1,0 +1,663 @@
+{#
+    Vista: ventas/new.html.twig
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Nueva Venta{% endblock %}
+
+{% block body %}
+
+    <div class="mx-auto" style="max-width: 1150px;">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h1 class="display-6 fw-light text-dark mb-1" style="letter-spacing: -1px;">
+                    Nueva Venta
+                </h1>
+
+                <p class="text-secondary mb-0">
+                    Crear una nueva venta con sus productos
+                </p>
+            </div>
+
+            <a href="{{ path('app_ventas_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+                Volver
+            </a>
+
+        </div>
+
+        <div class="card border-0 rounded-0 shadow-sm">
+
+            <div class="card-body p-4">
+
+                {{ form_start(form) }}
+
+                {# Ocultar campos que no deben mostrarse #}
+                {{ form_widget(form.fecha, { 'attr': { 'style': 'display:none;' } }) }}
+                {{ form_widget(form.subtotal, { 'attr': { 'style': 'display:none;' } }) }}
+                {{ form_widget(form.total, { 'attr': { 'style': 'display:none;' } }) }}
+                {{ form_widget(form.created_at, { 'attr': { 'style': 'display:none;' } }) }}
+                {{ form_widget(form.updated_at, { 'attr': { 'style': 'display:none;' } }) }}
+                {{ form_widget(form.usuario, { 'attr': { 'style': 'display:none;' } }) }}
+                {{ form_widget(form.cliente, { 'attr': { 'style': 'display:none;' } }) }}
+
+                {# ============================================ #}
+                {# SECCIÓN 1: DATOS DEL CLIENTE                #}
+                {# ============================================ #}
+
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">
+                            Cliente existente
+                        </label>
+                        <select id="cliente_id" class="form-select form-select-lg rounded-0 border-secondary shadow-none">
+                            <option value="">-- Seleccionar cliente --</option>
+                            {% for cliente in clientes %}
+                                <option value="{{ cliente.id }}"
+                                        data-nombre="{{ cliente.nombre }}"
+                                        data-telefono="{{ cliente.telefono }}"
+                                        data-dni="{{ cliente.dniCuit }}"
+                                        data-email="{{ cliente.email }}"
+                                        data-direccion="{{ cliente.direccion }}"
+                                        data-localidad="{{ cliente.localidad }}"
+                                        data-provincia="{{ cliente.provincia }}">
+                                    {{ cliente.nombre }} - {{ cliente.dniCuit }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {# Checkbox para crear cliente automáticamente, por defecto desactivado #}
+                    <div class="col-md-6 d-flex align-items-end gap-3">
+                        <div class="form-check">
+                            {{ form_widget(form.crear_cliente, {
+                                'attr': {
+                                    'class': 'form-check-input rounded-0'
+                                }
+
+                            }) }}
+                            {{ form_label(form.crear_cliente, 'Crear cliente automáticamente', {
+                                'label_attr': {
+                                    'class': 'form-check-label'
+                                }
+                            }) }}
+                        </div>
+                        <small class="text-secondary" style="font-size: 0.7rem;">
+                            Al activar, se creará un cliente con los datos ingresados
+                        </small>
+                    </div>
+
+                </div>
+
+                {# Datos del cliente #}
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-6">
+                        {{ form_label(form.cliente_nombre, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_nombre, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Nombre del cliente'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_nombre) }}</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        {{ form_label(form.cliente_telefono, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_telefono, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Teléfono'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_telefono) }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ form_label(form.cliente_dni, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_dni, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'DNI/CUIT'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_dni) }}</div>
+                    </div>
+
+                    <div class="col-md-8">
+                        {{ form_label(form.cliente_email, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_email, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Email'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_email) }}</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form_label(form.cliente_direccion, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_direccion, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Dirección',
+                                'rows': 2
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_direccion) }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ form_label(form.cliente_localidad, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_localidad, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Localidad'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_localidad) }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ form_label(form.cliente_provincia, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.cliente_provincia, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Provincia'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.cliente_provincia) }}</div>
+                    </div>
+
+                </div>
+
+                {# ============================================ #}
+                {# SECCIÓN 2: DATOS DE LA VENTA                #}
+                {# ============================================ #}
+
+                <div class="row g-3 mb-4">
+
+                    <div class="col-md-4">
+                        {{ form_label(form.forma_pago, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.forma_pago, {
+                            'attr': {
+                                'class': 'form-select form-select-lg rounded-0 border-secondary shadow-none'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.forma_pago) }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ form_label(form.estado, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.estado, {
+                            'attr': {
+                                'class': 'form-select form-select-lg rounded-0 border-secondary shadow-none'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.estado) }}</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        {{ form_label(form.descuento, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.descuento, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': '0.00',
+                                'step': '0.01'
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.descuento) }}</div>
+                    </div>
+
+                    <div class="col-md-12">
+                        {{ form_label(form.notas, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                        {{ form_widget(form.notas, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Observaciones de la venta',
+                                'rows': 3
+                            }
+                        }) }}
+                        <div class="text-danger small mt-1">{{ form_errors(form.notas) }}</div>
+                    </div>
+
+                </div>
+
+                {# ============================================ #}
+                {# SECCIÓN 3: PRODUCTOS DE LA VENTA              #}
+                {# ============================================ #}
+
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label fw-semibold text-dark small text-uppercase mb-0">
+                            Productos
+                        </label>
+                        <button type="button" class="btn btn-dark rounded-0 btn-sm" data-bs-toggle="modal" data-bs-target="#productosModal">
+                            <i class="bi bi-plus-lg"></i> Agregar Producto
+                        </button>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle" id="productosTabla">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="text-black fw-normal p-2">Producto</th>
+                                    <th class="text-black fw-normal p-2" style="width: 120px;">Cantidad</th>
+                                    <th class="text-black fw-normal p-2" style="width: 150px;">Precio Unit.</th>
+                                    <th class="text-black fw-normal p-2" style="width: 150px;">Subtotal</th>
+                                    <th class="text-black fw-normal p-2" style="width: 50px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="detallesBody">
+                                <tr class="text-center">
+                                    <td colspan="5" class="text-secondary py-4">No hay productos agregados</td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-bold">
+                                    <td colspan="3" class="text-end">TOTAL:</td>
+                                    <td colspan="2" id="totalGeneral">$0.00</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                {# ============================================ #}
+                {# SECCIÓN 4: BOTONES DE ACCIÓN                 #}
+                {# ============================================ #}
+
+                <div class="d-flex justify-content-between align-items-center mt-4">
+
+                    <a href="{{ path('app_ventas_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+                        Cancelar
+                    </a>
+
+                    <button type="submit" class="btn btn-dark rounded-0 px-5 py-2" id="btnGuardar">
+                        Guardar Venta
+                    </button>
+
+                </div>
+
+                {{ form_end(form) }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {# ============================================ #}
+    {# MODAL PARA SELECCIONAR PRODUCTOS             #}
+    {# ============================================ #}
+
+    <div class="modal fade" id="productosModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title">Seleccionar Producto</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-8">
+                            <input type="text" id="buscarProducto" class="form-control rounded-0 border-secondary shadow-none" placeholder="Buscar producto...">
+                        </div>
+                        <div class="col-md-4">
+                            <select id="filtroCategoria" class="form-select rounded-0 border-secondary shadow-none">
+                                <option value="">Todas las categorías</option>
+                                {% for categoria in categorias %}
+                                    <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div id="tablaProductosContainer">Cargando productos...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .pagination-nav { display: flex; justify-content: center; margin-top: 1rem; flex-wrap: wrap; gap: 2px; }
+        .pagination-nav .btn { margin: 0 2px; }
+        .pagination-nav .btn-primary { background-color: #212529 !important; border-color: #212529 !important; color: white !important; }
+    </style>
+
+    {# ============================================ #}
+    {# JAVASCRIPT                                   #}
+    {# ============================================ #}
+
+    <script>
+        let productosSeleccionados = [];
+
+        // =============================================
+        // ACTUALIZAR TABLA DE PRODUCTOS
+        // =============================================
+        function actualizarTablaProductos() {
+            const tbody = document.getElementById('detallesBody');
+            let total = 0;
+
+            if (productosSeleccionados.length === 0) {
+                tbody.innerHTML = '<tr class="text-center"><td colspan="5" class="text-secondary py-4">No hay productos agregados</td></tr>';
+                document.getElementById('totalGeneral').innerText = '$0.00';
+                return;
+            }
+
+            tbody.innerHTML = '';
+            productosSeleccionados.forEach((item, idx) => {
+                const subtotal = item.cantidad * item.precio;
+                total += subtotal;
+
+                const row = `
+                    <tr>
+                        <td class="fw-semibold">${item.nombre}</td>
+                        <td><input type="number" class="form-control form-control-sm cantidad" data-idx="${idx}" value="${item.cantidad}" step="0.001" min="0.001" style="width: 100px;"></td>
+                        <td><input type="number" class="form-control form-control-sm precio" data-idx="${idx}" value="${item.precio}" step="0.01" min="0" style="width: 120px;"></td>
+                        <td class="fw-semibold text-success">$${subtotal.toFixed(2)}</td>
+                        <td class="text-center"><button class="btn btn-sm btn-danger rounded-0 eliminar" data-idx="${idx}"><i class="bi bi-trash"></i></button></td>
+                    </tr>
+                `;
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
+
+            document.getElementById('totalGeneral').innerText = `$${total.toFixed(2)}`;
+
+            // Eventos de cantidad y precio
+            document.querySelectorAll('.cantidad').forEach(input => {
+                input.addEventListener('change', function() {
+                    const idx = this.dataset.idx;
+                    const nuevaCantidad = parseFloat(this.value);
+                    if (!isNaN(nuevaCantidad) && nuevaCantidad > 0) {
+                        productosSeleccionados[idx].cantidad = nuevaCantidad;
+                        actualizarTablaProductos();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.precio').forEach(input => {
+                input.addEventListener('change', function() {
+                    const idx = this.dataset.idx;
+                    const nuevoPrecio = parseFloat(this.value);
+                    if (!isNaN(nuevoPrecio) && nuevoPrecio >= 0) {
+                        productosSeleccionados[idx].precio = nuevoPrecio;
+                        actualizarTablaProductos();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.eliminar').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    productosSeleccionados.splice(idx, 1);
+                    actualizarTablaProductos();
+                });
+            });
+        }
+
+        // =============================================
+        // CARGAR PRODUCTOS EN EL MODAL
+        // =============================================
+        function cargarProductos(page, search, categoria) {
+            const container = document.getElementById('tablaProductosContainer');
+            container.innerHTML = 'Cargando...';
+
+            let url = `/api/productos/buscar?page=${page}&search=${encodeURIComponent(search)}`;
+            if (categoria) {
+                url += `&categoria=${categoria}`;
+            }
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.items || data.items.length === 0) {
+                        container.innerHTML = '<p class="text-center text-secondary py-4">No hay productos disponibles</p>';
+                        return;
+                    }
+
+                    let html = `
+                        <table class="table table-sm align-middle">
+                            <thead class="bg-dark text-white">
+                                <tr>
+                                    <th class="p-2">Producto</th>
+                                    <th class="p-2 text-end">Precio</th>
+                                    <th class="p-2 text-end">Stock</th>
+                                    <th class="p-2 text-center" style="width: 90px;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    data.items.forEach(p => {
+                        const yaAgregado = productosSeleccionados.some(item => item.id === p.id);
+                        html += `
+                            <tr>
+                                <td class="p-2 fw-semibold">${p.nombre}</td>
+                                <td class="p-2 text-end">$${parseFloat(p.precio).toFixed(2)}</td>
+                                <td class="p-2 text-end">${p.stock}</td>
+                                <td class="p-2 text-center">
+                                    <button class="btn btn-sm ${yaAgregado ? 'btn-secondary' : 'btn-dark'} rounded-0 seleccionar"
+                                            data-id="${p.id}"
+                                            data-nombre="${p.nombre}"
+                                            data-precio="${p.precio}"
+                                            ${yaAgregado ? 'disabled' : ''}>
+                                        ${yaAgregado ? '✓ Agregado' : 'Agregar'}
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += '</tbody></table>';
+
+                    // Paginación
+                    let pagination = '<div class="pagination-nav">';
+
+                    if (data.page > 1) {
+                        pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="${data.page - 1}">&laquo;</button>`;
+                    }
+
+                    let startPage = Math.max(1, data.page - 1);
+                    let endPage = Math.min(data.pageCount, data.page + 1);
+
+                    if (startPage > 1) {
+                        pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="1">1</button>`;
+                        if (startPage > 2) pagination += `<span class="mx-1 text-secondary">...</span>`;
+                    }
+
+                    for (let i = startPage; i <= endPage; i++) {
+                        pagination += `<button class="btn btn-sm ${i === data.page ? 'btn-dark' : 'btn-outline-secondary'} rounded-0 page-btn" data-page="${i}">${i}</button>`;
+                    }
+
+                    if (endPage < data.pageCount) {
+                        if (endPage < data.pageCount - 1) pagination += `<span class="mx-1 text-secondary">...</span>`;
+                        pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="${data.pageCount}">${data.pageCount}</button>`;
+                    }
+
+                    if (data.page < data.pageCount) {
+                        pagination += `<button class="btn btn-sm btn-outline-secondary rounded-0 page-btn" data-page="${data.page + 1}">&raquo;</button>`;
+                    }
+
+                    pagination += '</div>';
+
+                    container.innerHTML = html + pagination;
+
+                    // Eventos de paginación
+                    document.querySelectorAll('.page-btn').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const page = parseInt(this.dataset.page);
+                            const search = document.getElementById('buscarProducto').value;
+                            const categoria = document.getElementById('filtroCategoria').value;
+                            cargarProductos(page, search, categoria);
+                        });
+                    });
+
+                    // Eventos de selección
+                    document.querySelectorAll('.seleccionar:not([disabled])').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const id = this.dataset.id;
+                            const nombre = this.dataset.nombre;
+                            const precio = parseFloat(this.dataset.precio);
+
+                            const existe = productosSeleccionados.some(p => p.id === id);
+                            if (!existe) {
+                                productosSeleccionados.push({
+                                    id: id,
+                                    nombre: nombre,
+                                    precio: precio,
+                                    cantidad: 1
+                                });
+                                actualizarTablaProductos();
+
+                                // Recargar modal
+                                const search = document.getElementById('buscarProducto').value;
+                                const categoria = document.getElementById('filtroCategoria').value;
+                                cargarProductos(1, search, categoria);
+                            }
+                        });
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    container.innerHTML = '<p class="text-center text-danger py-4">Error al cargar productos</p>';
+                });
+        }
+
+        // =============================================
+        // CLIENTE EXISTENTE - CARGAR DATOS
+        // =============================================
+        document.getElementById('cliente_id').addEventListener('change', function() {
+            const selected = this.options[this.selectedIndex];
+            if (this.value) {
+                document.querySelector('input[name="ventas[cliente_nombre]"]').value = selected.dataset.nombre || '';
+                document.querySelector('input[name="ventas[cliente_telefono]"]').value = selected.dataset.telefono || '';
+                document.querySelector('input[name="ventas[cliente_dni]"]').value = selected.dataset.dni || '';
+                document.querySelector('input[name="ventas[cliente_email]"]').value = selected.dataset.email || '';
+                document.querySelector('textarea[name="ventas[cliente_direccion]"]').value = selected.dataset.direccion || '';
+                document.querySelector('input[name="ventas[cliente_localidad]"]').value = selected.dataset.localidad || '';
+                document.querySelector('input[name="ventas[cliente_provincia]"]').value = selected.dataset.provincia || '';
+            } else {
+                document.querySelector('input[name="ventas[cliente_nombre]"]').value = '';
+                document.querySelector('input[name="ventas[cliente_telefono]"]').value = '';
+                document.querySelector('input[name="ventas[cliente_dni]"]').value = '';
+                document.querySelector('input[name="ventas[cliente_email]"]').value = '';
+                document.querySelector('textarea[name="ventas[cliente_direccion]"]').value = '';
+                document.querySelector('input[name="ventas[cliente_localidad]"]').value = '';
+                document.querySelector('input[name="ventas[cliente_provincia]"]').value = '';
+            }
+        });
+
+        // =============================================
+        // GUARDAR VENTA
+        // =============================================
+        document.getElementById('btnGuardar').addEventListener('click', function(e) {
+            if (productosSeleccionados.length === 0) {
+                e.preventDefault();
+                alert('Agregue al menos un producto');
+                return;
+            }
+
+            const form = document.querySelector('form');
+
+            // Limpiar inputs de productos anteriores
+            form.querySelectorAll('.producto-input').forEach(el => el.remove());
+
+            // Agregar cada producto como campo oculto
+            productosSeleccionados.forEach((item, index) => {
+                const inputId = document.createElement('input');
+                inputId.type = 'hidden';
+                inputId.name = `productos[${index}][id]`;
+                inputId.value = item.id;
+                inputId.className = 'producto-input';
+                form.appendChild(inputId);
+
+                const inputCantidad = document.createElement('input');
+                inputCantidad.type = 'hidden';
+                inputCantidad.name = `productos[${index}][cantidad]`;
+                inputCantidad.value = item.cantidad;
+                inputCantidad.className = 'producto-input';
+                form.appendChild(inputCantidad);
+
+                const inputPrecio = document.createElement('input');
+                inputPrecio.type = 'hidden';
+                inputPrecio.name = `productos[${index}][precio]`;
+                inputPrecio.value = item.precio;
+                inputPrecio.className = 'producto-input';
+                form.appendChild(inputPrecio);
+            });
+
+            form.submit();
+        });
+
+        // =============================================
+        // INICIALIZAR MODAL
+        // =============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('productosModal');
+
+            modal.addEventListener('show.bs.modal', function() {
+                document.getElementById('buscarProducto').value = '';
+                document.getElementById('filtroCategoria').value = '';
+                cargarProductos(1, '', '');
+            });
+
+            document.getElementById('buscarProducto').addEventListener('input', function() {
+                const categoria = document.getElementById('filtroCategoria').value;
+                cargarProductos(1, this.value, categoria);
+            });
+
+            document.getElementById('filtroCategoria').addEventListener('change', function() {
+                const search = document.getElementById('buscarProducto').value;
+                cargarProductos(1, search, this.value);
+            });
+        });
+    </script>
+
+{% endblock %}

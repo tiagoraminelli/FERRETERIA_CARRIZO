@@ -1,0 +1,211 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Producto
+{% endblock %}
+
+{% block body %}
+
+	<div class="container py-5">
+
+		<div class="mx-auto" style="max-width: 720px;">
+
+			<div class="d-flex justify-content-between align-items-center mb-4">
+
+				<div>
+					<h1 class="display-6 fw-light text-dark mb-1">
+						Editar Producto
+					</h1>
+
+					<p class="text-secondary mb-0">
+						Actualizar información del producto
+					</p>
+				</div>
+
+				<a href="{{ path('app_productos_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+					Volver
+				</a>
+
+			</div>
+
+			<div class="card border-0 rounded-0 shadow-sm">
+
+				<div class="card-body p-5">
+
+					{{ form_start(form) }}
+
+					<div class="mb-4">
+
+						{{ form_label(form.nombre, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.nombre, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': 'Nombre del producto'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.nombre) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.descripcion, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.descripcion, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': 'Descripción del producto',
+                            'rows': 4
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.descripcion) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.precio_costo, null, {
+                        'label_attr': {
+                        'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                        }) }}
+
+						{{ form_widget(form.precio_costo, {
+                        'attr': {
+                        'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                        'placeholder': '0.00'
+                        }
+                        }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.precio_costo) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.precio, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.precio, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': '0.00'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.precio) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.stock, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.stock, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': '0'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.stock) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.categoria, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.categoria, {
+                        'attr': {
+                            'class': 'form-select form-select-lg rounded-0 border-secondary shadow-none'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.categoria) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						<div class="form-check">
+							{{ form_widget(form.activo, {
+                            'attr': {
+                                'class': 'form-check-input rounded-0 shadow-none'
+                            }
+                        }) }}
+							{{ form_label(form.activo, null, {
+                            'label_attr': {
+                                'class': 'form-check-label text-dark'
+                            }
+                        }) }}
+						</div>
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.activo) }}
+						</div>
+
+					</div>
+
+					<div class="d-flex justify-content-between align-items-center mt-5">
+
+						<a href="{{ path('app_productos_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+							Cancelar
+						</a>
+
+						<button class="btn btn-dark rounded-0 px-5 py-2">
+							Actualizar
+						</button>
+
+					</div>
+
+					{{ form_end(form) }}
+
+				</div>
+
+			</div>
+
+			<div class="d-flex justify-content-end mt-3">
+
+				{{ include('productos/_delete_form.html.twig') }}
+
+			</div>
+
+		</div>
+
+	</div>
+
+{% endblock %}

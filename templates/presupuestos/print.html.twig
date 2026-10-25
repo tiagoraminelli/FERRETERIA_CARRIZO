@@ -1,0 +1,535 @@
+{% extends 'layout/print.html.twig' %}
+
+{% block title %}Presupuesto #{{ presupuesto.id }}{% endblock %}
+
+{% block body %}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background: #e8e8e8;
+        padding: 30px 20px;
+        margin: 0;
+    }
+
+    .invoice-wrapper {
+        max-width: 800px;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        position: relative;
+    }
+
+    .invoice-header-bg {
+        height: 8px;
+        background: linear-gradient(90deg, #000000 0%, #333333 50%, #000000 100%);
+    }
+
+    .invoice-footer-bg {
+        height: 8px;
+        background: linear-gradient(90deg, #000000 0%, #333333 50%, #000000 100%);
+    }
+
+    .invoice-container {
+        padding: 40px 35px 35px 35px;
+    }
+
+    /* Logo y empresa */
+    .logo-area {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .logo-placeholder {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #1a1a1a 0%, #333333 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-placeholder i {
+        font-size: 2rem;
+        color: #f97316;
+    }
+
+    .company-info h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: #000;
+        margin: 0;
+    }
+
+    .company-info p {
+        font-size: 0.65rem;
+        color: #666;
+        margin: 3px 0 0 0;
+        letter-spacing: 1px;
+    }
+
+    /* Título del presupuesto */
+    .invoice-title {
+        text-align: right;
+    }
+
+    .invoice-title h2 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #666;
+        letter-spacing: 3px;
+        margin: 0;
+    }
+
+    .invoice-title h1 {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #000;
+        margin: 5px 0 0 0;
+    }
+
+    /* Secciones en columnas */
+    .section-title {
+        font-size: 0.6rem;
+        font-weight: 700;
+        color: #f97316;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+
+    .section-content {
+        font-size: 0.75rem;
+        color: #000;
+        margin-bottom: 15px;
+    }
+
+    .section-content p {
+        margin-bottom: 3px;
+    }
+
+    /* Grid de 2 columnas */
+    .row {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 -10px;
+    }
+
+    .col-6 {
+        flex: 0 0 50%;
+        padding: 0 10px;
+    }
+
+    .col-12 {
+        flex: 0 0 100%;
+        padding: 0 10px;
+    }
+
+    .text-right {
+        text-align: right;
+    }
+
+    .text-center {
+        text-align: center;
+    }
+
+    /* Línea decorativa */
+    .decorative-line {
+        height: 2px;
+        background: linear-gradient(90deg, #000 0%, #f97316 50%, #000 100%);
+        margin: 20px 0;
+    }
+
+    /* Tabla de productos */
+    .invoice-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+    }
+
+    .invoice-table th {
+        text-align: left;
+        padding: 10px 8px;
+        background: #1a1a1a;
+        color: white;
+        font-weight: 600;
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .invoice-table td {
+        padding: 10px 8px;
+        border-bottom: 1px solid #e0e0e0;
+        font-size: 0.75rem;
+    }
+
+    .invoice-table .text-right {
+        text-align: right;
+    }
+
+    .invoice-table .text-center {
+        text-align: center;
+    }
+
+    /* Totales */
+    .totals-wrapper {
+        margin-top: 15px;
+        padding-top: 12px;
+        border-top: 2px solid #f97316;
+    }
+
+    .totals-table {
+        width: 260px;
+        margin-left: auto;
+        border-collapse: collapse;
+    }
+
+    .totals-table td {
+        padding: 5px 0;
+        font-size: 0.8rem;
+    }
+
+    .totals-table .total-row {
+        border-top: 2px solid #000;
+        font-weight: 800;
+        font-size: 1rem;
+    }
+
+    /* Badge estado */
+    .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        font-size: 0.6rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .badge-borrador { background: #f0f0f0; color: #666; }
+    .badge-enviado { background: #f97316; color: white; }
+    .badge-aprobado { background: #000; color: white; }
+    .badge-rechazado { background: #dc3545; color: white; }
+
+    /* Sección legal */
+    .legal-section {
+        margin: 20px 0;
+        padding: 10px 12px;
+        background: #f9f9f9;
+        border-left: 3px solid #f97316;
+        font-family: 'Courier New', monospace;
+        font-size: 0.6rem;
+        color: #555;
+        line-height: 1.35;
+    }
+
+    .legal-section strong {
+        font-size: 0.65rem;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Firma y saludo */
+    .signature-section {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .signature-line {
+        margin-top: 25px;
+        width: 180px;
+        border-top: 1px solid #000;
+    }
+
+    .greeting {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.7rem;
+        color: #f97316;
+        font-weight: 500;
+    }
+
+    .footer-text {
+        text-align: center;
+        font-size: 0.6rem;
+        color: #999;
+        margin-top: 10px;
+    }
+
+    @media print {
+        body {
+            background: white;
+            padding: 0;
+        }
+        .no-print {
+            display: none !important;
+        }
+        .invoice-wrapper {
+            box-shadow: none;
+        }
+        .legal-section {
+            background: none;
+            border-left: 2px solid #000;
+        }
+    }
+
+    .btn-print {
+        background: #000;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 0.7rem;
+        margin-bottom: 15px;
+        display: inline-block;
+    }
+
+    .btn-print:hover {
+        background: #f97316;
+    }
+</style>
+
+<div class="invoice-wrapper">
+
+    <div class="invoice-header-bg"></div>
+
+    <div class="invoice-container">
+
+        <!-- Botón impresión -->
+        <div class="text-right no-print mb-2">
+            <button onclick="window.print()" class="btn-print">
+                📄 Imprimir / Guardar PDF
+            </button>
+        </div>
+
+        <!-- FILA 1: Logo + Título del presupuesto -->
+        <div class="row mb-3">
+            <div class="col-6">
+                <div class="logo-area">
+                    <div class="logo-placeholder">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                    <div class="company-info">
+                        <h1>FERRE</h1>
+                        <p>CARRIZO</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="invoice-title">
+                    <h2>PRESUPUESTO</h2>
+                    <h1>Nº {{ presupuesto.id }}</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="decorative-line"></div>
+
+    <!-- FILA 2: Datos de la empresa (4 columnas) -->
+<div class="row mb-3">
+    <div class="col-3">
+        <div class="section-title">EMPRESA</div>
+        <div class="section-content">
+            <p><strong>Ferretería Carrizo</strong></p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">CUIT</div>
+        <div class="section-content">
+            <p>30-12345678-9</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">INGRESOS BRUTOS</div>
+        <div class="section-content">
+            <p>901-123456</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">IVA</div>
+        <div class="section-content">
+            <p>Responsable Inscripto</p>
+        </div>
+    </div>
+</div>
+
+<!-- Fila adicional para dirección y contacto -->
+<div class="row mb-3">
+    <div class="col-6">
+        <div class="section-title">DOMICILIO</div>
+        <div class="section-content">
+            <p>Av. San Martín 1234</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">TELÉFONO</div>
+        <div class="section-content">
+            <p>(011) 1234-5678</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">EMAIL</div>
+        <div class="section-content">
+            <p>ventas@ferreteriacarrizo.com</p>
+        </div>
+    </div>
+</div>
+
+   <!-- FILA 3: Datos del cliente (4 columnas) -->
+<div class="row mb-3">
+    <div class="section-title">datos del cliente</div>
+    <div class="col-3">
+        <div class="section-title">CLIENTE</div>
+        <div class="section-content">
+            <p>{{ presupuesto.clienteNombre ?: 'Dato no implementado' }}</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">TELÉFONO</div>
+        <div class="section-content">
+            <p>{{ presupuesto.clienteTelefono ?: 'Dato no implementado' }}</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">DNI/CUIT</div>
+        <div class="section-content">
+            <p>Dato no implementado</p>
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="section-title">DOMICILIO</div>
+        <div class="section-content">
+            <p>Dato no implementado</p>
+        </div>
+    </div>
+</div>
+
+<!-- Fila 4: Vendedor + Fecha emisión (2 columnas) -->
+<div class="row mb-3">
+    <div class="col-6">
+        <div class="section-title">VENDEDOR</div>
+        <div class="section-content">
+            <p>{{ presupuesto.usuario ? presupuesto.usuario.name : 'Dato no implementado' }}</p>
+        </div>
+    </div>
+    <div class="col-6 text-right">
+        <div class="section-title">FECHA EMISIÓN</div>
+        <div class="section-content">
+            <p>{{ presupuesto.createdAt ? presupuesto.createdAt|date('d/m/Y H:i') : 'Dato no implementado' }}</p>
+        </div>
+    </div>
+</div>
+
+        <!-- SECCIÓN LEGAL (comunicados) -->
+        <div class="legal-section">
+            <strong>Ley 24.240 - Defensa del Consumidor</strong><br>
+            • Presupuesto válido por 30 días. Precio vinculante. Prohibido cobro de trabajos adicionales no autorizados por escrito.<br>
+            • Materiales NUEVOS. Si se utilizan usados, debe constar aceptación expresa del cliente.<br>
+            • Servicios y productos poseen garantía mínima de 30 días ante fallas o vicios.<br>
+            • La aceptación del presente implica conformidad con sus términos.<br><br>
+            <strong>Información Fiscal (RG AFIP 100/98)</strong><br>
+            • <strong>Emisor:</strong> Ferretería Carrizo | <strong>CUIT:</strong> 30-12345678-9 | <strong>Ingresos Brutos:</strong> 901-123456 | <strong>IVA:</strong> Resp. Inscripto.<br>
+            • La factura final será emitida electrónicamente (Tipo A). La aceptación implica consentimiento para su emisión.
+        </div>
+
+        <!-- TABLA DE PRODUCTOS (detalle) -->
+        <table class="invoice-table">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th class="text-center" style="width: 80px;">Cantidad</th>
+                    <th class="text-right" style="width: 100px;">Precio</th>
+                    <th class="text-right" style="width: 100px;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% set total = 0 %}
+                {% for detalle in presupuesto.detalles %}
+                    {% set subtotal = detalle.cantidad * detalle.precioUnitario %}
+                    {% set total = total + subtotal %}
+                    <tr>
+                        <td>{{ detalle.producto ? detalle.producto.nombre : 'Producto no disponible' }}</td>
+                        <td class="text-center">{{ detalle.cantidad|number_format(3, ',', '.') }}</td>
+                        <td class="text-right">${{ detalle.precioUnitario|number_format(2, ',', '.') }}</td>
+                        <td class="text-right">${{ subtotal|number_format(2, ',', '.') }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay productos asociados</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- TOTALES -->
+        <div class="totals-wrapper">
+            <table class="totals-table">
+                <tr>
+                    <td>Subtotal</td>
+                    <td class="text-right">${{ total|number_format(2, ',', '.') }}</td>
+                </tr>
+                <tr>
+                    <td>Descuento</td>
+                    <td class="text-right">${{ presupuesto.descuento|number_format(2, ',', '.') }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td><strong>TOTAL</strong></td>
+                    <td class="text-right"><strong>${{ (total - presupuesto.descuento)|number_format(2, ',', '.') }}</strong></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- OBSERVACIONES (si existen) -->
+        {% if presupuesto.notas %}
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="section-title">OBSERVACIONES</div>
+                    <div class="section-content">
+                        <p>{{ presupuesto.notas }}</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- FIRMAS Y SALUDO FINAL -->
+        <div class="signature-section">
+            <div class="row">
+                <div class="col-6">
+                    <div class="section-title">FIRMA DEL CLIENTE</div>
+                    <div class="signature-line"></div>
+                    <div style="font-size: 0.55rem; color: #999; margin-top: 5px;">Aclaración:</div>
+                </div>
+                <div class="col-6 text-right">
+                    <div class="section-title">FIRMA DE LA EMPRESA</div>
+                    <div class="signature-line" style="margin-left: auto;"></div>
+                    <div style="font-size: 0.55rem; color: #999; margin-top: 5px;">Ferretería Carrizo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SALUDO -->
+        <div class="greeting">
+            ¡Gracias por confiar en Ferretería Carrizo!
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer-text">
+            Este presupuesto es válido por 30 días desde su emisión
+        </div>
+
+    </div>
+
+    <div class="invoice-footer-bg"></div>
+
+</div>
+
+{% endblock %}

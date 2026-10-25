@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PresupuestosDetalle{% endblock %}
+
+{% block body %}
+    <h1>PresupuestosDetalle</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ presupuestos_detalle.id }}</td>
+            </tr>
+            <tr>
+                <th>Cantidad</th>
+                <td>{{ presupuestos_detalle.cantidad }}</td>
+            </tr>
+            <tr>
+                <th>Precio_unitario</th>
+                <td>{{ presupuestos_detalle.precioUnitario }}</td>
+            </tr>
+            <tr>
+                <th>Subtotal</th>
+                <td>{{ presupuestos_detalle.subtotal }}</td>
+            </tr>
+            <tr>
+                <th>Created_at</th>
+                <td>{{ presupuestos_detalle.createdAt ? presupuestos_detalle.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Updated_at</th>
+                <td>{{ presupuestos_detalle.updatedAt ? presupuestos_detalle.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_presupuestos_detalle_index') }}">back to list</a>
+
+    <a href="{{ path('app_presupuestos_detalle_edit', {'id': presupuestos_detalle.id}) }}">edit</a>
+
+    {{ include('presupuestos_detalle/_delete_form.html.twig') }}
+{% endblock %}

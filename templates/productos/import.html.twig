@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Importar Productos desde Excel{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="mx-auto" style="max-width: 800px;">
+            <h1 class="display-6 fw-light text-dark mb-1">Importar Productos</h1>
+            <p class="text-secondary mb-4">Sube un archivo Excel (.xlsx, .xls o .csv) para cargar productos masivamente.</p>
+
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} rounded-0">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="card border-0 rounded-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <label for="excel_file" class="form-label fw-medium">Archivo Excel</label>
+                            <input type="file" name="excel_file" id="excel_file" class="form-control rounded-0" accept=".xlsx,.xls,.csv" required>
+                        </div>
+
+                        <div class="alert alert-info rounded-0 small">
+                            <strong>Formato esperado (columnas):</strong><br>
+                            A: Nombre (obligatorio)<br>
+                            B: Descripción<br>
+                            C: Precio (obligatorio)<br>
+                            D: Precio Costo<br>
+                            E: Stock<br>
+                            F: Nombre de Categoría (debe existir)<br>
+                            G: Código de Barra<br>
+                            <em>La primera fila se considera encabezado y se omite.</em>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-dark rounded-0 px-4">
+                                <i class="bi bi-upload"></i> Importar
+                            </button>
+                            <a href="{{ path('app_productos_import_plantilla') }}" class="btn btn-outline-primary rounded-0 px-4">
+                                <i class="bi bi-download"></i> Descargar Plantilla
+                            </a>
+                            <a href="{{ path('app_productos_index') }}" class="btn btn-outline-secondary rounded-0 px-4">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

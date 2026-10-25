@@ -1,0 +1,102 @@
+{#
+    Vista: presupuestos_detalle/edit.html.twig
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Detalle{% endblock %}
+
+{% block body %}
+
+    <div class="mx-auto" style="max-width: 720px;">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                <h1 class="display-6 fw-light text-dark mb-1" style="letter-spacing: -1px;">
+                    Editar Detalle
+                </h1>
+                <p class="text-secondary mb-0">
+                    Modificar cantidad o precio del producto
+                </p>
+            </div>
+
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_presupuestos_detalle_index') }}" class="btn btn-outline-dark rounded-0 px-4 py-2">
+                    Volver
+                </a>
+            </div>
+
+        </div>
+
+        <div class="card border-0 rounded-0 shadow-sm">
+
+            <div class="card-body p-5">
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark small text-uppercase">
+                        Presupuesto
+                    </label>
+                    <p class="form-control-plaintext">
+                        #{{ presupuestos_detalle.presupuesto.id }} - {{ presupuestos_detalle.presupuesto.clienteNombre }}
+                    </p>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold text-dark small text-uppercase">
+                        Producto
+                    </label>
+                    <p class="form-control-plaintext">
+                        {{ presupuestos_detalle.producto.nombre }}
+                    </p>
+                </div>
+
+                <form method="post" action="{{ path('app_presupuestos_detalle_edit', {'id': presupuestos_detalle.id}) }}">
+
+                    <input type="hidden" name="_token" value="{{ csrf_token('edit' ~ presupuestos_detalle.id) }}">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">
+                            Cantidad
+                        </label>
+                        <input type="number" name="cantidad" step="0.001" value="{{ presupuestos_detalle.cantidad }}" class="form-control form-control-lg rounded-0 border-secondary shadow-none" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">
+                            Precio Unitario
+                        </label>
+                        <input type="number" name="precio_unitario" step="0.01" value="{{ presupuestos_detalle.precioUnitario }}" class="form-control form-control-lg rounded-0 border-secondary shadow-none" required>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold text-dark small text-uppercase">
+                            Subtotal
+                        </label>
+                        <p class="form-control-plaintext fw-bold">
+                            ${{ (presupuestos_detalle.cantidad * presupuestos_detalle.precioUnitario)|number_format(2, ',', '.') }}
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5">
+                        <a href="{{ path('app_presupuestos_detalle_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+                            Cancelar
+                        </a>
+                        <button class="btn btn-dark rounded-0 px-5 py-2">
+                            Actualizar
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+            {{ include('presupuestos_detalle/_delete_form.html.twig') }}
+        </div>
+
+    </div>
+
+{% endblock %}

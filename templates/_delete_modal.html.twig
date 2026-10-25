@@ -1,0 +1,41 @@
+{#
+    Modal genérico para confirmar eliminación
+    Uso:
+    - data-id: ID del elemento a eliminar
+    - data-name: Nombre del elemento para mostrar en el modal
+    - data-url: URL del delete (ej: path('app_users_delete', {'id': ''}) )
+    - data-token: CSRF token (opcional, se puede generar en cada entidad)
+#}
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content rounded-0">
+			<div class="modal-header border-0 pb-0">
+				<h5 class="modal-title fw-semibold text-dark" id="deleteModalLabel">
+					Confirmar Eliminación
+				</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body pt-3">
+				<p class="text-secondary mb-0">
+					¿Estás seguro de eliminar
+					<strong id="deleteItemName"></strong>?
+				</p>
+				<p class="text-danger small mt-2 mb-0">
+					Esta acción no se puede deshacer.
+				</p>
+			</div>
+			<div class="modal-footer border-0 pt-0">
+				<button type="button" class="btn btn-light border rounded-0 px-4" data-bs-dismiss="modal">
+					Cancelar
+				</button>
+				<form method="post" id="deleteForm" style="display: inline-block;">
+					<input type="hidden" name="_token" id="deleteToken" value="">
+					<button type="submit" class="btn btn-danger rounded-0 px-4">
+						Eliminar
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,121 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New User
+{% endblock %}
+
+{% block body %}
+
+	<div class="container py-5">
+
+		<div class="mx-auto" style="max-width: 720px;">
+
+			<div class="d-flex justify-content-between align-items-center mb-4">
+
+				<div>
+					<h1 class="display-6 fw-light text-dark mb-1">
+						Create User
+					</h1>
+
+					<p class="text-secondary mb-0">
+						Add a new user to the system
+					</p>
+				</div>
+
+				<a href="{{ path('app_users_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+					Back
+				</a>
+
+			</div>
+
+			<div class="card border-0 rounded-0 shadow-sm">
+
+				<div class="card-body p-5">
+
+					{{ form_start(form) }}
+
+					<div class="mb-4">
+
+						{{ form_label(form.name, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.name, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': 'Enter full name'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.name) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.email, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.email, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': 'Enter email address'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.email) }}
+						</div>
+
+					</div>
+
+					<div class="mb-4">
+
+						{{ form_label(form.password, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.password, {
+                        'attr': {
+                            'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                            'placeholder': 'Enter password'
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.password) }}
+						</div>
+
+					</div>
+
+					<div class="d-flex justify-content-between align-items-center mt-5">
+
+						<a href="{{ path('app_users_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+							Cancel
+						</a>
+
+						<button class="btn btn-dark rounded-0 px-5 py-2">
+							Create
+						</button>
+
+					</div>
+
+					{{ form_end(form) }}
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+{% endblock %}

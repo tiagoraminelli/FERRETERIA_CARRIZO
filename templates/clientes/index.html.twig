@@ -1,0 +1,193 @@
+{#
+    Vista: clientes/index.html.twig
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  Clientes
+{% endblock %}
+
+{% block body %}
+  <div class="container py-5">
+    <div class="mx-auto" style="max-width: 1150px;">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="display-6 fw-light text-dark mb-1" style="letter-spacing: -1px;">Clientes</h1>
+
+          <p class="text-secondary mb-0">Gestión de clientes del sistema</p>
+        </div>
+
+        <div class="d-flex gap-2">
+          <a href="{{ path('app_clientes_new') }}" class="btn btn-dark rounded-0 px-4 py-2">
+            <i class="bi bi-plus-lg"></i>
+            Nuevo Cliente
+          </a>
+        </div>
+      </div>
+
+      <div class="card border-0 rounded-0 shadow-sm">
+        <div class="card-body p-4 border-bottom bg-light">
+          <form method="GET" action="{{ path('app_clientes_index') }}" id="filtroForm">
+            <div class="row g-2 align-items-center">
+              <div class="col-md-4">
+                <input type="text" name="search" value="{{ search }}" class="form-control form-control-lg rounded-0 border-secondary shadow-none" placeholder="Buscar por nombre, DNI/CUIT, teléfono o email..." />
+              </div>
+
+              <div class="col-md-3">
+                <select name="activo" class="form-select form-select-lg rounded-0 border-secondary shadow-none">
+                  <option value="">Todos los estados</option>
+                  <option value="1" {{ activo == '1' ? 'selected' : '' }}>Activos</option>
+                  <option value="0" {{ activo == '0' ? 'selected' : '' }}>Inactivos</option>
+                </select>
+              </div>
+
+              <div class="col-auto">
+                <button class="btn btn-dark rounded-0 px-4 h-100">Buscar</button>
+              </div>
+
+              <div class="col-auto">
+                <a href="{{ path('app_clientes_index') }}" class="btn btn-outline-secondary rounded-0 px-4 h-100">Limpiar</a>
+              </div>
+            </div>
+
+            {# Fila de checkboxes para condiciones IVA #}
+            <div class="row mt-3">
+              <div class="col-12">
+                <label class="fw-semibold text-dark small text-uppercase me-3">Condición IVA:</label>
+                <div class="d-flex flex-wrap gap-3">
+                  <div class="form-check">
+                    <input class="form-check-input rounded-0" type="checkbox" name="condiciones[]" value="Consumidor Final" id="iva1" {{ 'Consumidor Final' in condiciones ? 'checked' : '' }} />
+                    <label class="form-check-label" for="iva1">Consumidor Final</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input rounded-0" type="checkbox" name="condiciones[]" value="Responsable Inscripto" id="iva2" {{ 'Responsable Inscripto' in condiciones ? 'checked' : '' }} />
+                    <label class="form-check-label" for="iva2">Responsable Inscripto</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input rounded-0" type="checkbox" name="condiciones[]" value="Monotributista" id="iva3" {{ 'Monotributista' in condiciones ? 'checked' : '' }} />
+                    <label class="form-check-label" for="iva3">Monotributista</label>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input rounded-0" type="checkbox" name="condiciones[]" value="Exento" id="iva4" {{ 'Exento' in condiciones ? 'checked' : '' }} />
+                    <label class="form-check-label" for="iva4">Exento</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table align-middle mb-0">
+            <thead class="border-bottom">
+              <tr class="bg-dark">
+                <th class="text-black fw-normal border-0 p-3">ID</th>
+
+                <th class="text-black fw-normal border-0 p-3">Nombre</th>
+
+                <th class="text-black fw-normal border-0 p-3">CUIT/DNI</th>
+
+                <th class="text-black fw-normal border-0 p-3">Teléfono</th>
+
+                <th class="text-black fw-normal border-0 p-3">Email</th>
+
+                <th class="text-black fw-normal border-0 p-3">Estado</th>
+
+                <th class="text-black fw-normal border-0 p-3 text-end">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {% for cliente in clientes %}
+                <tr class="border-top">
+                  <td class="p-3 text-secondary">#{{ cliente.id }}</td>
+
+                  <td class="p-3">
+                    <div class="fw-medium text-dark">{{ cliente.nombre }}</div>
+                    <small class="text-muted">{{ cliente.condicionIva }}</small>
+                  </td>
+
+                  <td class="p-3 text-secondary">{{ cliente.dniCuit ? : '-' }}</td>
+
+                  <td class="p-3 text-secondary">{{ cliente.telefono ? : '-' }}</td>
+
+                  <td class="p-3 text-secondary">{{ cliente.email ? : '-' }}</td>
+
+                  <td class="p-3">
+                    {% if cliente.activo %}
+                      <span class="badge bg-dark rounded-0 px-3 py-2 fw-normal">Activo</span>
+                    {% else %}
+                      <span class="badge bg-secondary rounded-0 px-3 py-2 fw-normal">Inactivo</span>
+                    {% endif %}
+                  </td>
+
+                  <td class="p-3 text-end">
+                    <a href="{{ path('app_clientes_show', { id: cliente.id }) }}" class="text-primary me-3" title="Ver"><i class="bi bi-eye"></i></a>
+
+                    <a href="{{ path('app_clientes_edit', { id: cliente.id }) }}" class="text-warning me-3" title="Editar"><i class="bi bi-pencil-square"></i></a>
+
+                    <button type="button" class="btn btn-link text-danger p-0 m-0" style="border: none; background: none;" title="Eliminar" data-delete data-id="{{ cliente.id }}" data-name="{{ cliente.nombre }}" data-url="{{ path('app_clientes_delete', { id: 'ID_PLACEHOLDER' }) }}" data-token="{{ csrf_token('delete' ~ cliente.id) }}"><i class="bi bi-trash"></i></button>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="7" class="text-center py-5 text-secondary">No se encontraron clientes</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-footer bg-white border-0 py-4">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <small class="text-secondary">
+              Total:
+              {{ clientes.getTotalItemCount }}
+              clientes
+            </small>
+
+            <nav>
+              <ul class="pagination pagination-sm mb-0">
+                {% if clientes.currentPageNumber > 1 %}
+                  <li class="page-item">
+                    <a class="page-link rounded-0 text-dark shadow-none" href="{{ path('app_clientes_index', { page: clientes.currentPageNumber - 1, search: search, activo: activo, condiciones: condiciones }) }}">&laquo;</a>
+                  </li>
+                {% endif %}
+
+                {% set start = clientes.currentPageNumber - 1 %}
+                {% set end = clientes.currentPageNumber + 1 %}
+
+                {% if start < 1 %}
+                  {% set start = 1 %}
+                  {% set end = 3 %}
+                {% endif %}
+
+                {% if end > clientes.pageCount %}
+                  {% set end = clientes.pageCount %}
+                  {% set start = clientes.pageCount - 2 %}
+                {% endif %}
+
+                {% if start < 1 %}
+                  {% set start = 1 %}
+                {% endif %}
+
+                {% for page in start..end %}
+                  <li class="page-item {{ page == clientes.currentPageNumber ? 'active' : '' }}">
+                    <a class="page-link rounded-0 shadow-none {{ page == clientes.currentPageNumber ? 'bg-dark border-dark text-white' : 'text-dark' }}" href="{{ path('app_clientes_index', { page: page, search: search, activo: activo, condiciones: condiciones }) }}">{{ page }}</a>
+                  </li>
+                {% endfor %}
+
+                {% if clientes.currentPageNumber < clientes.pageCount %}
+                  <li class="page-item">
+                    <a class="page-link rounded-0 text-dark shadow-none" href="{{ path('app_clientes_index', { page: clientes.currentPageNumber + 1, search: search, activo: activo, condiciones: condiciones }) }}">&raquo;</a>
+                  </li>
+                {% endif %}
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

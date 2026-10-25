@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ver Proveedor{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="mx-auto" style="max-width: 720px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                    <h1 class="display-6 fw-light text-dark mb-1">
+                        Ver Proveedor
+                    </h1>
+
+                    <p class="text-secondary mb-0">
+                        Detalles del proveedor
+                    </p>
+                </div>
+
+                <a href="{{ path('app_proveedores_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+                    Volver
+                </a>
+
+            </div>
+
+            <div class="card border-0 rounded-0 shadow-sm">
+
+                <div class="card-body p-5">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">ID</label>
+                            <p class="form-control-plaintext">{{ proveedore.id }}</p>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Estado</label>
+                            <p class="form-control-plaintext">
+                                {% if proveedore.activo %}
+                                    <span class="badge bg-dark rounded-0 px-3 py-2 fw-normal">Activo</span>
+                                {% else %}
+                                    <span class="badge bg-secondary rounded-0 px-3 py-2 fw-normal">Inactivo</span>
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Nombre</label>
+                            <p class="form-control-plaintext">{{ proveedore.nombre }}</p>
+                        </div>
+
+                        {% if proveedore.razonSocial %}
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold text-dark small text-uppercase">Razón Social</label>
+                                <p class="form-control-plaintext">{{ proveedore.razonSocial }}</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">CUIT</label>
+                            <p class="form-control-plaintext">{{ proveedore.cuit ?: '-' }}</p>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Teléfono</label>
+                            <p class="form-control-plaintext">{{ proveedore.telefono ?: '-' }}</p>
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Email</label>
+                            <p class="form-control-plaintext">{{ proveedore.email ?: '-' }}</p>
+                        </div>
+
+                        {% if proveedore.direccion %}
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold text-dark small text-uppercase">Dirección</label>
+                                <p class="form-control-plaintext">{{ proveedore.direccion }}</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Ciudad</label>
+                            <p class="form-control-plaintext">{{ proveedore.ciudad ?: '-' }}</p>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Provincia</label>
+                            <p class="form-control-plaintext">{{ proveedore.provincia ?: '-' }}</p>
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Código Postal</label>
+                            <p class="form-control-plaintext">{{ proveedore.codigoPostal ?: '-' }}</p>
+                        </div>
+
+                        {% if proveedore.contacto %}
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold text-dark small text-uppercase">Persona de Contacto</label>
+                                <p class="form-control-plaintext">{{ proveedore.contacto }}</p>
+                            </div>
+                        {% endif %}
+
+                        {% if proveedore.notas %}
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label fw-semibold text-dark small text-uppercase">Notas</label>
+                                <p class="form-control-plaintext">{{ proveedore.notas }}</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Creado</label>
+                            <p class="form-control-plaintext">{{ proveedore.createdAt ? proveedore.createdAt|date('Y-m-d H:i') : '-' }}</p>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-semibold text-dark small text-uppercase">Actualizado</label>
+                            <p class="form-control-plaintext">{{ proveedore.updatedAt ? proveedore.updatedAt|date('Y-m-d H:i') : '-' }}</p>
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5">
+
+                        <a href="{{ path('app_proveedores_edit', {'id': proveedore.id}) }}" class="btn btn-dark rounded-0 px-4 py-2">
+                            Editar
+                        </a>
+
+                        {{ include('proveedores/_delete_form.html.twig') }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

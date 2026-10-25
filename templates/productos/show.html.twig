@@ -1,0 +1,223 @@
+{#
+    Vista: productos/show.html.twig
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Ver Producto{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="mx-auto" style="max-width: 1000px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                    <h1 class="display-6 fw-light text-dark mb-1">
+                        Ver Producto
+                    </h1>
+
+                    <p class="text-secondary mb-0">
+                        Detalles del producto
+                    </p>
+                </div>
+
+                <a href="{{ path('app_productos_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+                    Volver
+                </a>
+
+            </div>
+
+            <div class="card border-0 rounded-0 shadow-sm">
+
+                <div class="card-body p-5">
+
+                    <div class="row g-4">
+
+                        {# Columna izquierda - Imagen y datos secundarios #}
+                        <div class="col-md-4">
+
+                            {# Imagen #}
+                            <div class="mb-4">
+                                {% if producto.imagen %}
+                                    <img
+                                        src="{{ asset('uploads/productos/' ~ producto.imagen) }}"
+                                        alt="{{ producto.nombre }}"
+                                        class="img-fluid border w-100"
+                                        style="max-height: 250px; object-fit: contain;"
+                                    >
+                                {% else %}
+                                    <div class="bg-light border d-flex align-items-center justify-content-center" style="height: 200px;">
+                                        <i class="bi bi-image display-1 text-secondary"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            {# Estado #}
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">Estado</label>
+                                <p>
+                                    {% if producto.activo %}
+                                        <span class="badge bg-dark rounded-0 px-3 py-2 fw-normal">Activo</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary rounded-0 px-3 py-2 fw-normal">Inactivo</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+
+                            {# Creado #}
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">Creado</label>
+                                <p class="fw-light">{{ producto.createdAt ? producto.createdAt|date('d/m/Y H:i') : '-' }}</p>
+                            </div>
+
+                            {# Actualizado #}
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">Actualizado</label>
+                                <p class="fw-light">{{ producto.updatedAt ? producto.updatedAt|date('d/m/Y H:i') : '-' }}</p>
+                            </div>
+
+                        </div>
+
+                        {# Columna derecha - Información del producto #}
+                        <div class="col-md-8">
+
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">ID</label>
+                                <p class="fw-light">#{{ producto.id }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">Nombre</label>
+                                <p class="fw-light">{{ producto.nombre }}</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">Descripción</label>
+                                <p class="fw-light">{{ producto.descripcion ?: '-' }}</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-semibold text-dark small text-uppercase">Categoría</label>
+                                    <p class="fw-light">{{ producto.categoria ? producto.categoria.nombre : 'Sin categoría' }}</p>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="fw-semibold text-dark small text-uppercase">Código de Barras</label>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <p class="fw-light mb-0">{{ producto.codigoBarra ?: '-' }}</p>
+                                        {% if producto.codigoBarra %}
+                                            <a
+                                                href="{{ path('app_productos_barcode', {'id': producto.id}) }}"
+                                                class="btn btn-outline-dark btn-sm rounded-0"
+                                                target="_blank"
+                                                title="Exportar código de barras"
+                                            >
+                                                <i class="bi bi-upc-scan"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-semibold text-dark small text-uppercase">Precio Costo</label>
+                                    <p class="text-danger fw-light">${{ producto.precioCosto|number_format(2, ',', '.') }}</p>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-semibold text-dark small text-uppercase">Precio Venta</label>
+                                    <p class="text-success fw-light">${{ producto.precio|number_format(2, ',', '.') }}</p>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label class="fw-semibold text-dark small text-uppercase">Stock</label>
+                                    <p class="fw-light">{{ producto.stock|number_format(3, ',', '.') }}</p>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {# Historial de versiones #}
+                    <div class="mt-5 pt-4 border-top">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h2 class="h5 fw-light text-dark mb-0">Historial de cambios</h2>
+                            <small class="text-muted">{{ historial|length }} versión(es) registrada(s)</small>
+                        </div>
+
+                        {% if historial is not empty %}
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead class="border-bottom bg-light">
+                                        <tr>
+                                            <th class="text-dark fw-normal small text-uppercase p-2">Fecha</th>
+                                            <th class="text-dark fw-normal small text-uppercase p-2">Nombre</th>
+                                            <th class="text-dark fw-normal small text-uppercase p-2">Precio</th>
+                                            <th class="text-dark fw-normal small text-uppercase p-2">Costo</th>
+                                            <th class="text-dark fw-normal small text-uppercase p-2">Stock</th>
+                                            <th class="text-dark fw-normal small text-uppercase p-2">Estado</th>
+                                            <th class="text-dark fw-normal small text-uppercase p-2 text-end">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for h in historial %}
+                                            <tr class="border-top">
+                                                <td class="p-2 text-secondary small">{{ h.created_at|date('d/m/Y H:i:s') }}</td>
+                                                <td class="p-2 small">{{ h.nombre }}</td>
+                                                <td class="p-2 text-success-emphasis small">${{ h.precio|number_format(2, ',', '.') }}</td>
+                                                <td class="p-2 text-danger-emphasis small">${{ h.precio_costo ? h.precio_costo|number_format(2, ',', '.') : '-' }}</td>
+                                                <td class="p-2 small">{{ h.stock }}</td>
+                                                <td class="p-2 small">
+                                                    {% if h.activo %}
+                                                        <span class="badge bg-dark rounded-0 fw-normal">Activo</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary rounded-0 fw-normal">Inactivo</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="p-2 text-end">
+                                                    <form
+                                                        method="post"
+                                                        action="{{ path('app_productos_restaurar', { id: producto.id, historialId: h.id }) }}"
+                                                        onsubmit="return confirm('¿Restaurar la versión del {{ h.created_at|date('d/m/Y H:i') }}? Se guardará el estado actual en el historial.');"
+                                                    >
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('restaurar' ~ producto.id) }}">
+                                                        <button class="btn btn-sm btn-outline-warning rounded-0">
+                                                            <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <p class="text-muted small mb-0">No hay versiones anteriores. El historial se llenará a medida que edites este producto.</p>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+
+                        <a href="{{ path('app_productos_edit', {'id': producto.id}) }}" class="btn btn-dark rounded-0 px-4">
+                            <i class="bi bi-pencil-square"></i> Editar
+                        </a>
+
+                        {{ include('productos/_delete_form.html.twig') }}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

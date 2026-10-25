@@ -1,0 +1,296 @@
+{#
+    Vista: proveedores/index.html.twig
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Proveedores{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="mx-auto" style="max-width: 1150px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                    <h1 class="display-6 fw-light text-dark mb-1" style="letter-spacing: -1px;">
+                        Proveedores
+                    </h1>
+
+                    <p class="text-secondary mb-0">
+                        Gestión de proveedores del sistema
+                    </p>
+                </div>
+
+                <a href="{{ path('app_proveedores_new') }}" class="btn btn-dark rounded-0 px-4 py-2">
+                    Nuevo Proveedor
+                </a>
+
+            </div>
+
+            <div class="card border-0 rounded-0 shadow-sm">
+
+                <div class="card-body p-4 border-bottom bg-light">
+
+                    <form method="GET" action="{{ path('app_proveedores_index') }}">
+
+                        <div class="row g-2 align-items-center">
+
+                            <div class="col-md-5">
+
+                                <input type="text" name="search" value="{{ search }}" class="form-control form-control-lg rounded-0 border-secondary shadow-none" placeholder="Buscar por nombre, razón social, CUIT o email...">
+
+                            </div>
+
+                            <div class="col-md-3">
+
+                                <select name="activo" class="form-select form-select-lg rounded-0 border-secondary shadow-none">
+                                    <option value="">Todos los estados</option>
+                                    <option value="1" {{ activo == '1' ? 'selected' : '' }}>Activos</option>
+                                    <option value="0" {{ activo == '0' ? 'selected' : '' }}>Inactivos</option>
+                                </select>
+
+                            </div>
+
+                            <div class="col-auto">
+
+                                <button class="btn btn-dark rounded-0 px-4 h-100">
+                                    Buscar
+                                </button>
+
+                            </div>
+
+                            <div class="col-auto">
+
+                                <a href="{{ path('app_proveedores_index') }}" class="btn btn-outline-secondary rounded-0 px-4 h-100">
+                                    Limpiar
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table class="table align-middle mb-0">
+
+                        <thead class="border-bottom">
+
+                            <tr class="bg-dark">
+
+                                <th class="text-black fw-normal border-0 p-3">
+                                    ID
+                                </th>
+
+                                <th class="text-black fw-normal border-0 p-3">
+                                    Nombre
+                                </th>
+
+                                <th class="text-black fw-normal border-0 p-3">
+                                    CUIT
+                                </th>
+
+                                <th class="text-black fw-normal border-0 p-3">
+                                    Teléfono
+                                </th>
+
+                                <th class="text-black fw-normal border-0 p-3">
+                                    Email
+                                </th>
+
+                                <th class="text-black fw-normal border-0 p-3">
+                                    Estado
+                                </th>
+
+                                <th class="text-black fw-normal border-0 p-3 text-end">
+                                    Acciones
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            {% for proveedore in proveedores %}
+
+                                <tr class="border-top">
+
+                                    <td class="p-3 text-secondary">
+                                        #{{ proveedore.id }}
+                                    </td>
+
+                                    <td class="p-3 fw-medium text-dark">
+                                        {{ proveedore.nombre }}
+                                    </td>
+
+                                    <td class="p-3 text-secondary">
+                                        {{ proveedore.cuit }}
+                                    </td>
+
+                                    <td class="p-3 text-secondary">
+                                        {{ proveedore.telefono }}
+                                    </td>
+
+                                    <td class="p-3 text-secondary">
+                                        {{ proveedore.email }}
+                                    </td>
+
+                                    <td class="p-3">
+
+                                        {% if proveedore.activo %}
+
+                                            <span class="badge bg-dark rounded-0 px-3 py-2 fw-normal">
+                                                Activo
+                                            </span>
+
+                                        {% else %}
+
+                                            <span class="badge bg-secondary rounded-0 px-3 py-2 fw-normal">
+                                                Inactivo
+                                            </span>
+
+                                        {% endif %}
+
+                                    </td>
+
+                                    <td class="p-3 text-end">
+
+                                        <a href="{{ path('app_proveedores_show', {'id': proveedore.id}) }}" class="text-primary me-3" title="Ver">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+
+                                        <a href="{{ path('app_proveedores_edit', {'id': proveedore.id}) }}" class="text-warning me-3" title="Editar">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <button type="button"
+                                                class="btn btn-link text-danger p-0 m-0"
+                                                style="border: none; background: none;"
+                                                title="Eliminar"
+                                                data-delete
+                                                data-id="{{ proveedore.id }}"
+                                                data-name="{{ proveedore.nombre }}"
+                                                data-url="{{ path('app_proveedores_delete', {'id': 'ID_PLACEHOLDER'}) }}"
+                                                data-token="{{ csrf_token('delete' ~ proveedore.id) }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+                            {% else %}
+
+                                <tr>
+
+                                    <td colspan="7" class="text-center py-5 text-secondary">
+
+                                        No se encontraron proveedores
+
+                                    </td>
+
+                                </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                <div class="card-footer bg-white border-0 py-4">
+
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+                        <small class="text-secondary">
+                            Total:
+                            {{ proveedores.getTotalItemCount }}
+                            proveedores
+                        </small>
+
+                        <nav>
+
+                            <ul class="pagination pagination-sm mb-0">
+
+                                {% if proveedores.currentPageNumber > 1 %}
+
+                                    <li class="page-item">
+
+                                        <a class="page-link rounded-0 text-dark shadow-none" href="{{ path('app_proveedores_index', { page: proveedores.currentPageNumber - 1, search: search, activo: activo }) }}">
+
+                                            &laquo;
+
+                                        </a>
+
+                                    </li>
+
+                                {% endif %}
+
+                                {% set start = proveedores.currentPageNumber - 1 %}
+                                {% set end = proveedores.currentPageNumber + 1 %}
+
+                                {% if start < 1 %}
+                                    {% set start = 1 %}
+                                    {% set end = 3 %}
+                                {% endif %}
+
+                                {% if end > proveedores.pageCount %}
+                                    {% set end = proveedores.pageCount %}
+                                    {% set start = proveedores.pageCount - 2 %}
+                                {% endif %}
+
+                                {% if start < 1 %}
+                                    {% set start = 1 %}
+                                {% endif %}
+
+                                {% for page in start..end %}
+
+                                    <li class="page-item {{ page == proveedores.currentPageNumber ? 'active' : '' }}">
+
+                                        <a class="page-link rounded-0 shadow-none {{ page == proveedores.currentPageNumber ? 'bg-dark border-dark text-white' : 'text-dark' }}" href="{{ path('app_proveedores_index', { page: page, search: search, activo: activo }) }}">
+
+                                            {{ page }}
+
+                                        </a>
+
+                                    </li>
+
+                                {% endfor %}
+
+                                {% if proveedores.currentPageNumber < proveedores.pageCount %}
+
+                                    <li class="page-item">
+
+                                        <a class="page-link rounded-0 text-dark shadow-none" href="{{ path('app_proveedores_index', { page: proveedores.currentPageNumber + 1, search: search, activo: activo }) }}">
+
+                                            &raquo;
+
+                                        </a>
+
+                                    </li>
+
+                                {% endif %}
+
+                            </ul>
+
+                        </nav>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

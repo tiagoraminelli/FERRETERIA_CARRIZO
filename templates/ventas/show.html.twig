@@ -1,0 +1,144 @@
+{#
+    Vista: ventas/show.html.twig
+    Estilo Ticket / Factura
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  Venta #{{ venta.id }}
+{% endblock %}
+
+{% block body %}
+  <div class="mx-auto py-4" style="max-width: 700px;">
+    {# Botones de acción #}
+    <div class="d-flex justify-content-end gap-2 mb-4 no-print">
+      <button onclick="window.print()" class="btn btn-outline-secondary rounded-0 px-4"><i class="bi bi-printer"></i> Imprimir</button>
+      <a href="{{ path('app_ventas_edit', { id: venta.id }) }}" class="btn btn-dark rounded-0 px-4"><i class="bi bi-pencil-square"></i> Editar</a>
+      <a href="{{ path('app_ventas_index') }}" class="btn btn-outline-dark rounded-0 px-4"><i class="bi bi-arrow-left"></i> Volver</a>
+    </div>
+
+    {# Ticket #}
+    <div class="card border-0 shadow-sm rounded-0">
+      <div class="card-body p-4 p-md-5">
+        {# Cabecera #}
+        <div class="text-center border-bottom pb-3 mb-3">
+          <h2 class="fw-bold mb-0" style="letter-spacing: 3px;">VENTA</h2>
+          <h1 class="fw-bold text-dark mb-0" style="font-size: 2.2rem;">#{{ venta.id }}</h1>
+          <span class="badge {{ venta.estado == 'pagada' ? 'bg-success' : venta.estado == 'anulada' ? 'bg-danger' : 'bg-warning text-dark' }} rounded-0 px-3 py-2 mt-1">{{ venta.estado|upper }}</span>
+          <div class="text-secondary mt-2" style="font-size: 0.75rem;">{{ venta.fecha ? venta.fecha|date('d/m/Y H:i') : '-' }}</div>
+        </div>
+
+        {# Datos del cliente #}
+        <div class="mb-3 pb-2 border-bottom">
+          <div class="text-secondary small text-uppercase" style="font-size: 0.65rem;">Cliente</div>
+          <div class="fw-semibold">
+            {% if venta.cliente %}
+              <a href="{{ path('app_clientes_show', { id: venta.cliente.id }) }}" class="text-dark">{{ venta.cliente.nombre }}</a>
+            {% else %}
+              {{ venta.clienteNombre }}
+            {% endif %}
+          </div>
+          <div style="font-size: 0.75rem; color: #6c757d;">
+            {% if venta.clienteTelefono %}{{ venta.clienteTelefono }}{% endif %}
+            {% if venta.clienteDni %}
+              | {{ venta.clienteDni }}
+            {% endif %}
+          </div>
+        </div>
+
+        {# Tabla de productos #}
+        <div class="table-responsive mb-3">
+          <table class="table table-sm table-borderless" style="font-size: 0.8rem;">
+            <thead class="border-bottom">
+              <tr>
+                <th class="ps-0">Producto</th>
+                <th class="text-center" style="width: 60px;">Cant.</th>
+                <th class="text-end" style="width: 90px;">Precio</th>
+                <th class="text-end pe-0" style="width: 90px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set total = 0 %}
+              {% for detalle in venta.detalles %}
+                {% set subtotal = detalle.cantidad * detalle.precioUnitario %}
+                {% set total = total + subtotal %}
+                <tr>
+                  <td class="ps-0">
+                    <div class="fw-semibold">{{ detalle.producto ? detalle.producto.nombre : 'Producto no disponible' }}</div>
+                    <div style="font-size: 0.65rem; color: #999;">Código: {{ detalle.producto ? detalle.producto.codigoBarra : '-' }}</div>
+                  </td>
+                  <td class="text-center">{{ detalle.cantidad|number_format(3, ',', '.') }}</td>
+                  <td class="text-end">${{ detalle.precioUnitario|number_format(2, ',', '.') }}</td>
+                  <td class="text-end pe-0">${{ subtotal|number_format(2, ',', '.') }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="4" class="text-center py-3 text-secondary">No hay productos</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+            <tfoot class="border-top">
+              <tr>
+                <td colspan="3" class="text-end pt-2">Subtotal</td>
+                <td class="text-end pt-2 pe-0">${{ total|number_format(2, ',', '.') }}</td>
+              </tr>
+              <tr>
+                <td colspan="3" class="text-end">Descuento</td>
+                <td class="text-end pe-0">${{ venta.descuento|number_format(2, ',', '.') }}</td>
+              </tr>
+              <tr class="fw-bold" style="font-size: 1.1rem;">
+                <td colspan="3" class="text-end">TOTAL</td>
+                <td class="text-end pe-0 text-success">${{ (total - venta.descuento)|number_format(2, ',', '.') }}</td>
+              </tr>
+              <tr>
+                <td colspan="4" class="text-end" style="font-size: 0.75rem; color: #6c757d;">Forma de pago: {{ venta.formaPago|capitalize }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {# Notas #}
+        {% if venta.notas %}
+          <div class="mb-3 pt-2 border-top">
+            <div class="text-secondary small text-uppercase" style="font-size: 0.65rem;">Observaciones</div>
+            <div style="font-size: 0.8rem;">{{ venta.notas }}</div>
+          </div>
+        {% endif %}
+
+        {# Pie del ticket #}
+        <div class="text-center pt-3 border-top">
+          <div style="font-size: 0.7rem; color: #999;">{{ venta.usuario ? 'Vendedor: ' ~ venta.usuario.name : '' }}</div>
+          <div style="font-size: 0.7rem; color: #999;">Creado: {{ venta.createdAt ? venta.createdAt|date('d/m/Y H:i') : '-' }}</div>
+          <div style="font-size: 0.7rem; color: #999; margin-top: 5px;">¡Gracias por su compra!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      .card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+      }
+      .badge {
+        border: 1px solid #000;
+        background: none !important;
+        color: #000 !important;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+      }
+      .container,
+      .mx-auto {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+    }
+  </style>
+{% endblock %}

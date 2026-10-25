@@ -1,0 +1,555 @@
+{#
+    Vista: productos/bulk_update.html.twig
+    Actualización masiva de productos - Edición individual y por categoría
+#}
+
+{% extends 'base.html.twig' %}
+
+{% block title %}Actualización Masiva de Productos{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="mx-auto" style="max-width: 1200px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                    <h1 class="display-6 fw-light text-dark mb-1" style="letter-spacing: -1px;">
+                        Actualización Masiva
+                    </h1>
+
+                    <p class="text-secondary mb-0">
+                        Editar múltiples productos o aplicar cambios por categoría
+                    </p>
+                </div>
+
+                <a href="{{ path('app_productos_index') }}" class="btn btn-outline-dark rounded-0 px-4 py-2">
+                    Volver
+                </a>
+
+            </div>
+
+            <!-- Pestañas -->
+            <ul class="nav nav-tabs border-0 mb-4" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active bg-dark text-white rounded-0 me-2" id="individual-tab" data-bs-toggle="tab" data-bs-target="#individual" type="button" role="tab">
+                        Edición Individual
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link bg-dark text-white rounded-0" id="categoria-tab" data-bs-toggle="tab" data-bs-target="#categoria" type="button" role="tab">
+                        Por Categoría
+                    </button>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+
+                <!-- Pestaña 1: Edición Individual -->
+                <div class="tab-pane fade show active" id="individual" role="tabpanel">
+
+                    <div class="card border-0 rounded-0 shadow-sm">
+
+                        <div class="card-body p-4 border-bottom bg-light">
+
+                            <div class="row g-2 align-items-center">
+
+                                <div class="col-md-5">
+
+                                    <input type="text" id="search_input" class="form-control form-control-lg rounded-0 border-secondary shadow-none" placeholder="Buscar por nombre o descripción...">
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <select id="categoria_select" class="form-select form-select-lg rounded-0 border-secondary shadow-none">
+                                        <option value="">Todas las categorías</option>
+                                        {% for categoria in categorias %}
+                                            <option value="{{ categoria.id }}">
+                                                {{ categoria.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+
+                                <div class="col-auto">
+
+                                    <button type="button" id="btnFiltrar" class="btn btn-dark rounded-0 px-4 h-100">
+                                        Filtrar
+                                    </button>
+
+                                </div>
+
+                                <div class="col-auto">
+
+                                    <button type="button" id="btnLimpiar" class="btn btn-outline-secondary rounded-0 px-4 h-100">
+                                        Limpiar
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="card-body p-4">
+
+                            <form method="post" action="{{ path('app_productos_bulk_update_individual') }}" id="bulkIndividualForm">
+
+                                <input type="hidden" name="_token" value="{{ csrf_token('bulk_update_individual') }}">
+
+                                <div class="table-responsive" id="tablaProductosContainer">
+
+                                    <div class="text-center py-5 text-secondary">
+                                        Cargando productos...
+                                    </div>
+
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-4" id="botonesAccion" style="display: none;">
+
+                                    <div>
+                                        <button type="button" id="btnMarcarTodos" class="btn btn-outline-secondary rounded-0 btn-sm">
+                                            Activar todos
+                                        </button>
+                                        <button type="button" id="btnDesmarcarTodos" class="btn btn-outline-secondary rounded-0 btn-sm">
+                                            Desactivar todos
+                                        </button>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-dark rounded-0 px-5 py-2">
+                                        Guardar todos los cambios
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Pestaña 2: Por Categoría -->
+                <div class="tab-pane fade" id="categoria" role="tabpanel">
+
+                    <div class="card border-0 rounded-0 shadow-sm">
+
+                        <div class="card-body p-5">
+
+                            <form method="post" action="{{ path('app_productos_bulk_update_categoria') }}">
+
+                                <input type="hidden" name="_token" value="{{ csrf_token('bulk_update_categoria') }}">
+
+                                <div class="mb-4">
+
+                                    <label class="form-label fw-semibold text-dark small text-uppercase">
+                                        Categoría a afectar
+                                    </label>
+
+                                    <select name="categoria_id" class="form-select form-select-lg rounded-0 border-secondary shadow-none" required>
+                                        <option value="">Seleccione una categoría</option>
+                                        {% for categoria in categorias %}
+                                            <option value="{{ categoria.id }}">
+                                                {{ categoria.nombre }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <label class="form-label fw-semibold text-dark small text-uppercase">
+                                        Acción a aplicar
+                                    </label>
+
+                                    <select name="tipo_accion" id="tipo_accion" class="form-select form-select-lg rounded-0 border-secondary shadow-none" required>
+                                        <option value="">Seleccione una acción</option>
+                                        <option value="precio_porcentaje">Aumentar precio (%)</option>
+                                        <option value="precio_descuento">Disminuir precio (%)</option>
+                                        <option value="precio_fijo">Establecer precio fijo</option>
+                                        <option value="precio_incremento_fijo">Aumentar precio (monto fijo)</option>
+                                        <option value="precio_decremento_fijo">Disminuir precio (monto fijo)</option>
+                                        <option value="stock_incrementar">Incrementar stock (+)</option>
+                                        <option value="stock_decrementar">Decrementar stock (-)</option>
+                                        <option value="stock_fijo">Establecer stock fijo</option>
+                                        <option value="estado_activar">Activar productos</option>
+                                        <option value="estado_desactivar">Desactivar productos</option>
+                                    </select>
+
+                                </div>
+
+                                <div class="mb-4" id="div_valor">
+
+                                    <label class="form-label fw-semibold text-dark small text-uppercase" id="label_valor">
+                                        Valor
+                                    </label>
+
+                                    <input type="number" name="valor" step="any" class="form-control form-control-lg rounded-0 border-secondary shadow-none" placeholder="Ej: 10" id="input_valor">
+
+                                    <div class="small text-secondary mt-1" id="ayuda_valor">
+                                        Ingrese el valor numérico
+                                    </div>
+
+                                </div>
+
+                                <div class="mb-4">
+
+                                    <div class="alert alert-warning rounded-0">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        Esta acción afectará a <strong>TODOS</strong> los productos de la categoría seleccionada.
+                                    </div>
+
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mt-5">
+
+                                    <a href="{{ path('app_productos_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+                                        Cancelar
+                                    </a>
+
+                                    <button type="submit" class="btn btn-dark rounded-0 px-5 py-2" onclick="return confirm('¿Estás seguro? Esta acción afectará a todos los productos de la categoría seleccionada.');">
+                                        Aplicar
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ============================================
+            // AJAX para filtrar productos sin recargar
+            // ============================================
+            const searchInput = document.getElementById('search_input');
+            const categoriaSelect = document.getElementById('categoria_select');
+            const btnFiltrar = document.getElementById('btnFiltrar');
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const tablaContainer = document.getElementById('tablaProductosContainer');
+            const botonesAccion = document.getElementById('botonesAccion');
+
+            // Enviar formulario de edición individual vía AJAX
+const bulkIndividualForm = document.getElementById('bulkIndividualForm');
+
+if (bulkIndividualForm) {
+    bulkIndividualForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Guardando...';
+        submitBtn.disabled = true;
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Mostrar mensaje temporal
+                mostrarMensajeExito(data.message);
+                // Recargar la tabla con los filtros actuales
+                cargarProductos();
+            } else {
+                mostrarMensajeError(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarMensajeError('Error al guardar los cambios');
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+}
+
+function mostrarMensajeExito(mensaje) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success rounded-0 alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        <i class="bi bi-check-circle"></i> ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    const container = document.querySelector('#individual .card-body');
+    container.insertBefore(alertDiv, container.firstChild);
+
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+function mostrarMensajeError(mensaje) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger rounded-0 alert-dismissible fade show';
+    alertDiv.innerHTML = `
+        <i class="bi bi-exclamation-triangle"></i> ${mensaje}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    const container = document.querySelector('#individual .card-body');
+    container.insertBefore(alertDiv, container.firstChild);
+
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+            function cargarProductos() {
+                const search = searchInput ? searchInput.value : '';
+                const categoria = categoriaSelect ? categoriaSelect.value : '';
+
+                tablaContainer.innerHTML = '<div class="text-center py-5 text-secondary">Cargando productos...</div>';
+
+                fetch('{{ path('app_productos_bulk_fetch') }}?search=' + encodeURIComponent(search) + '&categoria=' + encodeURIComponent(categoria))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.productos && data.productos.length > 0) {
+                            let html = `
+                                <table class="table table-bordered align-middle">
+                                    <thead class="bg-dark">
+                                        <tr>
+                                            <th class="text-black fw-normal p-3">ID</th>
+                                            <th class="text-black fw-normal p-3">Nombre</th>
+                                            <th class="text-black fw-normal p-3">Categoría</th>
+                                            <th class="text-black fw-normal p-3" style="width: 150px;">Stock</th>
+                                            <th class="text-black fw-normal p-3" style="width: 150px;">Precio Costo</th>
+                                            <th class="text-black fw-normal p-3" style="width: 150px;">Precio Venta</th>
+                                            <th class="text-black fw-normal p-3" style="width: 100px;">Activo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+
+                            data.productos.forEach(p => {
+                                const checked = p.activo ? 'checked' : '';
+                                html += `
+    <tr>
+        <td class="p-3">
+            #${p.id}
+            <input type="hidden" name="id[]" value="${p.id}">
+        </td>
+
+        <td class="p-3">
+            <div class="fw-medium text-dark">
+                ${escapeHtml(p.nombre)}
+            </div>
+
+            <small class="text-muted">
+                ${escapeHtml(p.descripcion || '')}
+            </small>
+        </td>
+
+        <td class="p-3">
+            ${escapeHtml(p.categoria) || 'Sin categoría'}
+        </td>
+
+        <td class="p-3">
+            <input
+                type="number"
+                name="stock[${p.id}]"
+                value="${p.stock}"
+                step="0.001"
+                class="form-control form-control-sm rounded-0">
+        </td>
+
+        <td class="p-3">
+            <input
+                type="number"
+                name="precio_costo[${p.id}]"
+                value="${p.precioCosto}"
+                step="0.01"
+                class="form-control form-control-sm rounded-0">
+        </td>
+
+        <td class="p-3">
+            <input
+                type="number"
+                name="precio[${p.id}]"
+                value="${p.precio}"
+                step="0.01"
+                class="form-control form-control-sm rounded-0">
+        </td>
+
+        <td class="p-3 text-center">
+            <div class="form-check d-flex justify-content-center">
+                <input
+                    type="checkbox"
+                    name="activo[${p.id}]"
+                    value="1"
+                    class="form-check-input rounded-0"
+                    ${checked}>
+            </div>
+        </td>
+    </tr>
+`;
+                            });
+
+                            html += `
+                                    </tbody>
+                                </table>
+                            `;
+
+                            tablaContainer.innerHTML = html;
+                            botonesAccion.style.display = 'flex';
+
+                            const btnMarcarTodos = document.getElementById('btnMarcarTodos');
+                            const btnDesmarcarTodos = document.getElementById('btnDesmarcarTodos');
+
+                            if (btnMarcarTodos) {
+                                btnMarcarTodos.addEventListener('click', function() {
+                                    document.querySelectorAll('input[type="checkbox"][name^="activo"]').forEach(cb => {
+                                        cb.checked = true;
+                                    });
+                                });
+                            }
+
+                            if (btnDesmarcarTodos) {
+                                btnDesmarcarTodos.addEventListener('click', function() {
+                                    document.querySelectorAll('input[type="checkbox"][name^="activo"]').forEach(cb => {
+                                        cb.checked = false;
+                                    });
+                                });
+                            }
+
+                        } else {
+                            tablaContainer.innerHTML = '<div class="text-center py-5 text-secondary">No se encontraron productos</div>';
+                            botonesAccion.style.display = 'none';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        tablaContainer.innerHTML = '<div class="text-center py-5 text-danger">Error al cargar productos</div>';
+                        botonesAccion.style.display = 'none';
+                    });
+            }
+
+            function escapeHtml(str) {
+                if (!str) return '';
+                return str.replace(/[&<>]/g, function(m) {
+                    if (m === '&') return '&amp;';
+                    if (m === '<') return '&lt;';
+                    if (m === '>') return '&gt;';
+                    return m;
+                });
+            }
+
+            if (btnFiltrar) {
+                btnFiltrar.addEventListener('click', cargarProductos);
+            }
+
+            if (btnLimpiar) {
+                btnLimpiar.addEventListener('click', function() {
+                    if (searchInput) searchInput.value = '';
+                    if (categoriaSelect) categoriaSelect.value = '';
+                    cargarProductos();
+                });
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        cargarProductos();
+                    }
+                });
+            }
+
+            cargarProductos();
+
+            // ============================================
+            // Script para pestaña de categoría
+            // ============================================
+            const tipoAccion = document.getElementById('tipo_accion');
+            const labelValor = document.getElementById('label_valor');
+            const inputValor = document.getElementById('input_valor');
+            const ayudaValor = document.getElementById('ayuda_valor');
+            const divValor = document.getElementById('div_valor');
+
+            if (tipoAccion) {
+                tipoAccion.addEventListener('change', function() {
+                    const valor = this.value;
+
+                    if (valor === 'estado_activar' || valor === 'estado_desactivar') {
+                        if (divValor) divValor.style.display = 'none';
+                        return;
+                    } else {
+                        if (divValor) divValor.style.display = 'block';
+                    }
+
+                    switch(valor) {
+                        case 'precio_porcentaje':
+                            labelValor.textContent = 'Porcentaje a aumentar';
+                            ayudaValor.textContent = 'Ej: 5 = aumentar 5%';
+                            inputValor.step = '0.01';
+                            break;
+                        case 'precio_descuento':
+                            labelValor.textContent = 'Porcentaje de descuento';
+                            ayudaValor.textContent = 'Ej: 10 = descontar 10%';
+                            inputValor.step = '0.01';
+                            break;
+                        case 'precio_fijo':
+                            labelValor.textContent = 'Nuevo precio';
+                            ayudaValor.textContent = 'Ej: 99.99';
+                            inputValor.step = '0.01';
+                            break;
+                        case 'precio_incremento_fijo':
+                            labelValor.textContent = 'Monto a aumentar';
+                            ayudaValor.textContent = 'Ej: 500 = sumar $500';
+                            inputValor.step = '0.01';
+                            break;
+                        case 'precio_decremento_fijo':
+                            labelValor.textContent = 'Monto a disminuir';
+                            ayudaValor.textContent = 'Ej: 200 = restar $200';
+                            inputValor.step = '0.01';
+                            break;
+                        case 'stock_incrementar':
+                            labelValor.textContent = 'Cantidad a sumar';
+                            ayudaValor.textContent = 'Ej: 50 = sumar 50 unidades';
+                            inputValor.step = '1';
+                            break;
+                        case 'stock_decrementar':
+                            labelValor.textContent = 'Cantidad a restar';
+                            ayudaValor.textContent = 'Ej: 20 = restar 20 unidades';
+                            inputValor.step = '1';
+                            break;
+                        case 'stock_fijo':
+                            labelValor.textContent = 'Nuevo stock';
+                            ayudaValor.textContent = 'Ej: 100';
+                            inputValor.step = '1';
+                            break;
+                        default:
+                            labelValor.textContent = 'Valor';
+                            ayudaValor.textContent = 'Ingrese el valor numérico';
+                    }
+                });
+            }
+
+        });
+    </script>
+
+{% endblock %}

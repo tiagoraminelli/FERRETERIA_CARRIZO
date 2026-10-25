@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+  Ver Cliente
+{% endblock %}
+
+{% block body %}
+  <div class="container py-5">
+    <div class="mx-auto" style="max-width: 720px;">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="display-6 fw-light text-dark mb-1">Ver Cliente</h1>
+
+          <p class="text-secondary mb-0">Detalles del cliente</p>
+        </div>
+
+        <a href="{{ path('app_clientes_index') }}" class="btn btn-outline-dark rounded-0 px-4">Volver</a>
+      </div>
+
+      <div class="card border-0 rounded-0 shadow-sm">
+        <div class="card-body p-5">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">ID</label>
+              <p class="form-control-plaintext">#{{ cliente.id }}</p>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Estado</label>
+              <p class="form-control-plaintext">
+                {% if cliente.activo %}
+                  <span class="badge bg-dark rounded-0 px-3 py-2 fw-normal">Activo</span>
+                {% else %}
+                  <span class="badge bg-secondary rounded-0 px-3 py-2 fw-normal">Inactivo</span>
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="col-md-12 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Nombre / Razón Social</label>
+              <p class="form-control-plaintext">{{ cliente.nombre }}</p>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">DNI / CUIT</label>
+              <p class="form-control-plaintext">{{ cliente.dniCuit ? : '-' }}</p>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Teléfono</label>
+              <p class="form-control-plaintext">{{ cliente.telefono ? : '-' }}</p>
+            </div>
+
+            <div class="col-md-12 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Email</label>
+              <p class="form-control-plaintext">{{ cliente.email ? : '-' }}</p>
+            </div>
+
+            {% if cliente.direccion %}
+              <div class="col-md-12 mb-4">
+                <label class="form-label fw-semibold text-dark small text-uppercase">Dirección</label>
+                <p class="form-control-plaintext">{{ cliente.direccion }}</p>
+              </div>
+            {% endif %}
+
+            <div class="col-md-4 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Localidad</label>
+              <p class="form-control-plaintext">{{ cliente.localidad ? : '-' }}</p>
+            </div>
+
+            <div class="col-md-4 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Provincia</label>
+              <p class="form-control-plaintext">{{ cliente.provincia ? : '-' }}</p>
+            </div>
+
+            <div class="col-md-4 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Código Postal</label>
+              <p class="form-control-plaintext">{{ cliente.codigoPostal ? : '-' }}</p>
+            </div>
+
+            <div class="col-md-12 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Condición frente al IVA</label>
+              <p class="form-control-plaintext">{{ cliente.condicionIva }}</p>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Creado</label>
+              <p class="form-control-plaintext">{{ cliente.createdAt ? cliente.createdAt|date('d/m/Y H:i') : '-' }}</p>
+            </div>
+
+            <div class="col-md-6 mb-4">
+              <label class="form-label fw-semibold text-dark small text-uppercase">Actualizado</label>
+              <p class="form-control-plaintext">{{ cliente.updatedAt ? cliente.updatedAt|date('d/m/Y H:i') : '-' }}</p>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mt-5">
+            <a href="{{ path('app_clientes_edit', { id: cliente.id }) }}" class="btn btn-dark rounded-0 px-4 py-2"><i class="bi bi-pencil-square"></i> Editar</a>
+
+            {{ include('clientes/_delete_form.html.twig') }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

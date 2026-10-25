@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}User Details
+{% endblock %}
+
+{% block body %}
+
+	<div class="container py-5">
+
+		<div class="mx-auto" style="max-width: 720px;">
+
+			<div class="d-flex justify-content-between align-items-center mb-4">
+
+				<div>
+					<h1 class="display-6 fw-light text-dark mb-1">
+						User Details
+					</h1>
+
+					<p class="text-secondary mb-0">
+						View user information
+					</p>
+				</div>
+
+				<a href="{{ path('app_users_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+					Back
+				</a>
+
+			</div>
+
+			<div class="card border-0 rounded-0 shadow-sm">
+
+				<div class="card-body p-0">
+
+					<table class="table align-middle mb-0">
+
+						<tbody>
+
+							<tr>
+								<th class="bg-light text-dark fw-semibold p-4" style="width: 220px;">
+									ID
+								</th>
+
+								<td class="p-4 text-secondary">
+									#{{ user.id }}
+								</td>
+							</tr>
+
+							<tr>
+								<th class="bg-light text-dark fw-semibold p-4">
+									Name
+								</th>
+
+								<td class="p-4 text-dark fw-medium">
+									{{ user.name }}
+								</td>
+							</tr>
+
+							<tr>
+								<th class="bg-light text-dark fw-semibold p-4">
+									Email
+								</th>
+
+								<td class="p-4 text-secondary">
+									{{ user.email }}
+								</td>
+							</tr>
+
+							<tr>
+								<th class="bg-light text-dark fw-semibold p-4">
+									Verification
+								</th>
+
+								<td class="p-4">
+
+									{% if user.emailVerifiedAt %}
+
+										<span class="badge bg-dark rounded-0 px-3 py-2">
+											Verified
+										</span>
+
+										<div class="small text-secondary mt-2">
+											{{ user.emailVerifiedAt|date('Y-m-d H:i') }}
+										</div>
+
+									{% else %}
+
+										<span class="badge bg-secondary rounded-0 px-3 py-2">
+											Not verified
+										</span>
+
+									{% endif %}
+
+								</td>
+							</tr>
+
+							<tr>
+								<th class="bg-light text-dark fw-semibold p-4">
+									Password
+								</th>
+
+								<td class="p-4">
+									<code class="bg-light px-2 py-1 text-secondary">
+										{{ user.password|slice(0, 25) }}...
+									</code>
+								</td>
+							</tr>
+
+						</tbody>
+
+					</table>
+
+				</div>
+
+			</div>
+
+			<div class="d-flex justify-content-between align-items-center mt-4">
+
+				<div>
+					{{ include('users/_delete_form.html.twig') }}
+				</div>
+
+				<a href="{{ path('app_users_edit', {'id': user.id}) }}" class="btn btn-dark rounded-0 px-5">
+					Edit User
+				</a>
+
+			</div>
+
+		</div>
+
+	</div>
+
+{% endblock %}

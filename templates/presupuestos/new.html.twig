@@ -1,0 +1,203 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nuevo Presupuesto{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="mx-auto" style="max-width: 720px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                    <h1 class="display-6 fw-light text-dark mb-1">
+                        Nuevo Presupuesto
+                    </h1>
+
+                    <p class="text-secondary mb-0">
+                        Crear un nuevo presupuesto
+                    </p>
+                </div>
+
+                <a href="{{ path('app_presupuestos_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+                    Volver
+                </a>
+
+            </div>
+
+            <div class="card border-0 rounded-0 shadow-sm">
+
+                <div class="card-body p-5">
+
+                    {{ form_start(form) }}
+
+                    <div class="row">
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.cliente_nombre, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.cliente_nombre, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Nombre del cliente'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.cliente_nombre) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.cliente_telefono, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.cliente_telefono, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Teléfono de contacto'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.cliente_telefono) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+
+                            {{ form_label(form.usuario, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.usuario, {
+                            'attr': {
+                                'class': 'form-select form-select-lg rounded-0 border-secondary shadow-none'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.usuario) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+
+                            {{ form_label(form.estado, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.estado, {
+                            'attr': {
+                                'class': 'form-select form-select-lg rounded-0 border-secondary shadow-none'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.estado) }}
+                            </div>
+
+                        </div>
+
+                        {#
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.subtotal, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                            {{ form_widget(form.subtotal, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': '0.00',
+                                'step': '0.01'
+                            }
+                        }) }}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.subtotal) }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.descuento, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+                            {{ form_widget(form.descuento, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': '0.00',
+                                'step': '0.01'
+                            }
+                        }) }}
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.descuento) }}
+                            </div>
+                        </div>
+                        #}
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.notas, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.notas, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Observaciones del presupuesto',
+                                'rows': 4
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.notas) }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5">
+
+                        <a href="{{ path('app_presupuestos_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+                            Cancelar
+                        </a>
+
+                        <button class="btn btn-dark rounded-0 px-5 py-2">
+                            Crear
+                        </button>
+
+                    </div>
+
+                    {{ form_end(form) }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

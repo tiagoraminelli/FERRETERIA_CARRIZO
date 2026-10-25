@@ -1,0 +1,319 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nuevo Proveedor{% endblock %}
+
+{% block body %}
+
+    <div class="container py-5">
+
+        <div class="mx-auto" style="max-width: 720px;">
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+
+                <div>
+                    <h1 class="display-6 fw-light text-dark mb-1">
+                        Nuevo Proveedor
+                    </h1>
+
+                    <p class="text-secondary mb-0">
+                        Agregar un nuevo proveedor al sistema
+                    </p>
+                </div>
+
+                <a href="{{ path('app_proveedores_index') }}" class="btn btn-outline-dark rounded-0 px-4">
+                    Volver
+                </a>
+
+            </div>
+
+            <div class="card border-0 rounded-0 shadow-sm">
+
+                <div class="card-body p-5">
+
+                    {{ form_start(form) }}
+
+                    <div class="row">
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.nombre, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.nombre, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Nombre del proveedor'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.nombre) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.razon_social, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.razon_social, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Razón social'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.razon_social) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+
+                            {{ form_label(form.cuit, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.cuit, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'XX-XXXXXXXX-X'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.cuit) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6 mb-4">
+
+                            {{ form_label(form.telefono, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.telefono, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': '+54 XXX XXX-XXXX'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.telefono) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.email, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.email, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'proveedor@email.com'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.email) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.direccion, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.direccion, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Calle, número, piso, etc.',
+                                'rows': 3
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.direccion) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+
+                            {{ form_label(form.ciudad, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.ciudad, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Ciudad'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.ciudad) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+
+                            {{ form_label(form.provincia, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.provincia, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Provincia'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.provincia) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4 mb-4">
+
+                            {{ form_label(form.codigo_postal, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.codigo_postal, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Código postal'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.codigo_postal) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.contacto, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.contacto, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Persona de contacto'
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.contacto) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            {{ form_label(form.notas, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+                            {{ form_widget(form.notas, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Información adicional',
+                                'rows': 3
+                            }
+                        }) }}
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.notas) }}
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-12 mb-4">
+
+                            <div class="form-check">
+                                {{ form_widget(form.activo, {
+                                'attr': {
+                                    'class': 'form-check-input rounded-0 shadow-none'
+                                }
+                            }) }}
+                                {{ form_label(form.activo, null, {
+                                'label_attr': {
+                                    'class': 'form-check-label text-dark'
+                                }
+                            }) }}
+                            </div>
+
+                            <div class="small text-secondary mt-1">
+                                Los proveedores se crean como <strong>Activos</strong> por defecto.
+                            </div>
+
+                            <div class="text-danger small mt-1">
+                                {{ form_errors(form.activo) }}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-5">
+
+                        <a href="{{ path('app_proveedores_index') }}" class="btn btn-light border rounded-0 px-4 py-2">
+                            Cancelar
+                        </a>
+
+                        <button class="btn btn-dark rounded-0 px-5 py-2">
+                            Crear
+                        </button>
+
+                    </div>
+
+                    {{ form_end(form) }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}
