@@ -2,28 +2,73 @@
 
 namespace App\Controller;
 
-use App\Entity\Categoria;
 use App\Entity\Productos;
+use App\Entity\Categoria;
 use App\Form\ProductosType;
-use App\Repository\CategoriaRepository;
 use App\Repository\ProductosRepository;
-use App\Service\ProductosExcelImporter;
+use App\Repository\CategoriaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
-use Picqer\Barcode\BarcodeGeneratorSVG;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Picqer\Barcode\BarcodeGeneratorSVG;
 
 
 #[Route('/productos')]
 final class ProductosController extends AbstractController
 {
 
+
+    #[Route('/{id}/restaurar/{historialId}', name: 'app_productos_restaurar', methods: ['POST'])]
+    public function restaurarVersion(
+        Productos $producto,
+        int $historialId,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
+        // 1. Validar token CSRF
+        if (!$this->isCsrfTokenValid('restaurar' . $producto->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Token inválido');
+            return $this->redirectToRoute('app_productos_show', ['id' => $producto->getId()]);
+        }
+
+        // 2. Buscar la versión en el historial
+        $conn = $entityManager->getConnection();
+        $historial = $conn->fetchAssociative(
+            'SELECT * FROM productos_historial WHERE id = :id AND producto_id = :producto_id',
+            ['id' => $historialId, 'producto_id' => $producto->getId()]
+        );
+
+        if (!$historial) {
+            throw $this->createNotFoundException('Versión no encontrada para este producto');
+        }
+
+        // 3. Restaurar los valores al producto actual
+        $producto->setNombre($historial['nombre']);
+        $producto->setDescripcion($historial['descripcion']);
+        $producto->setPrecio((string)($historial['precio'] ?? '0'));
+        $producto->setPrecioCosto($historial['precio_costo'] !== null ? (string)$historial['precio_costo'] : null);
+        $producto->setStock((string)($historial['stock'] ?? '0'));
+        $producto->setImagen($historial['imagen']);
+        $producto->setActivo((bool)($historial['activo'] ?? false));
+        $producto->setCodigoBarra($historial['codigo_barra']);
+
+        if (!empty($historial['categoria_id'])) {
+            $categoria = $entityManager->getRepository(Categoria::class)->find($historial['categoria_id']);
+            $producto->setCategoria($categoria);
+        } else {
+            $producto->setCategoria(null);
+        }
+
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Producto restaurado a la versión del ' . $historial['created_at']);
+        return $this->redirectToRoute('app_productos_show', ['id' => $producto->getId()]);
+    }
 
 
     #[Route('/export-pdf', name: 'app_productos_export_pdf', methods: ['GET'])]
@@ -57,18 +102,25 @@ final class ProductosController extends AbstractController
 
         $barcodeGenerator = new BarcodeGeneratorSVG();
         $barcodeData = [];
+        $qrData = []; // <-- 1. NUEVO ARRAY PARA LOS QR
 
         foreach ($productos as $producto) {
             if ($producto->getCodigoBarra()) {
+                // Generar Código de Barras
                 $barcodeData[$producto->getId()] = base64_encode(
                     $barcodeGenerator->getBarcode($producto->getCodigoBarra(), $barcodeGenerator::TYPE_CODE_128)
                 );
+
+                // 2. Generar Código QR y guardarlo en base64
+                $qrUrl = 'https://quickchart.io/qr?text=' . urlencode($producto->getCodigoBarra()) . '&size=150&margin=1';
+                $qrData[$producto->getId()] = base64_encode(file_get_contents($qrUrl));
             }
         }
 
         return $this->render('productos/export_pdf.html.twig', [
             'productos' => $productos,
             'barcode_data' => $barcodeData,
+            'qr_data' => $qrData, // <-- 3. PASAMOS LOS QR A LA VISTA
             'fecha' => (new \DateTime())->format('d/m/Y H:i'),
             'filtros' => [
                 'search' => $search,
@@ -306,163 +358,6 @@ final class ProductosController extends AbstractController
 
         $this->addFlash('success', "{$contador} productos actualizados correctamente");
         return $this->redirectToRoute('app_productos_bulk_update');
-    }
-
-    #[Route('/import', name: 'app_productos_import', methods: ['GET', 'POST'])]
-    public function import(
-        Request $request,
-        ProductosExcelImporter $excelImporter
-    ): Response {
-        if ($request->isMethod('POST')) {
-            /** @var UploadedFile|null $file */
-            $file = $request->files->get('excel_file');
-
-            if (!$file) {
-                $this->addFlash('danger', 'Debes seleccionar un archivo Excel.');
-                return $this->redirectToRoute('app_productos_import');
-            }
-
-            $allowedExtensions = ['xlsx', 'xls', 'csv'];
-            if (!in_array(strtolower($file->getClientOriginalExtension()), $allowedExtensions)) {
-                $this->addFlash('danger', 'Formato no válido. Usa xlsx, xls o csv.');
-                return $this->redirectToRoute('app_productos_import');
-            }
-
-            $uploadDir = $this->getParameter('kernel.project_dir') . '/var/imports';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
-            }
-
-            $newFilename = uniqid('import_') . '.' . $file->guessExtension();
-            $file->move($uploadDir, $newFilename);
-            $filePath = $uploadDir . '/' . $newFilename;
-
-            try {
-                $result = $excelImporter->import($filePath);
-
-                if ($result['success'] > 0) {
-                    $this->addFlash('success', "{$result['success']} productos importados correctamente.");
-                }
-                foreach ($result['errors'] as $error) {
-                    $this->addFlash('warning', $error);
-                }
-                if ($result['success'] === 0 && empty($result['errors'])) {
-                    $this->addFlash('warning', 'No se encontraron datos para importar.');
-                }
-            } catch (\Exception $e) {
-                $this->addFlash('danger', 'Error al procesar el Excel: ' . $e->getMessage());
-            } finally {
-                if (file_exists($filePath)) {
-                    unlink($filePath);
-                }
-            }
-
-            return $this->redirectToRoute('app_productos_index');
-        }
-
-        return $this->render('productos/import.html.twig', [
-            'breadcrumbs' => [
-                ['label' => 'Productos', 'url' => $this->generateUrl('app_productos_index')],
-                ['label' => 'Importar Excel', 'url' => '']
-            ],
-        ]);
-    }
-
-
-    #[Route('/import/plantilla', name: 'app_productos_import_plantilla', methods: ['GET'])]
-    public function importPlantilla(): Response
-    {
-        $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Encabezados
-        $sheet->setCellValue('A1', 'Nombre');
-        $sheet->setCellValue('B1', 'Descripción');
-        $sheet->setCellValue('C1', 'Precio');
-        $sheet->setCellValue('D1', 'Costo');
-        $sheet->setCellValue('E1', 'Stock');
-        $sheet->setCellValue('F1', 'Categoría');
-        $sheet->setCellValue('G1', 'Código de Barra');
-
-        // Estilos de encabezado
-        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
-        $sheet->getStyle('A1:G1')->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFE0E0E0');
-
-        // Anchos de columna
-        $sheet->getColumnDimension('A')->setWidth(25);
-        $sheet->getColumnDimension('B')->setWidth(35);
-        $sheet->getColumnDimension('C')->setWidth(12);
-        $sheet->getColumnDimension('D')->setWidth(12);
-        $sheet->getColumnDimension('E')->setWidth(10);
-        $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->getColumnDimension('G')->setWidth(20);
-
-        // Nombre del archivo: AAAAMMDD_HHMMSS_productos.xlsx
-        $filename = (new \DateTime())->format('Ymd_His') . '_productos.xlsx';
-
-        // Enviar al navegador
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-
-        $response = new Response();
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-        $response->headers->set('Cache-Control', 'max-age=0');
-
-        ob_start();
-        $writer->save('php://output');
-        $content = ob_get_clean();
-
-        $response->setContent($content);
-
-        $spreadsheet->disconnectWorksheets();
-
-        return $response;
-    }
-
-    #[Route('/{id}/restaurar/{historialId}', name: 'app_productos_restaurar', methods: ['POST'])]
-    public function restaurarVersion(
-        Productos $producto,
-        int $historialId,
-        Request $request,
-        EntityManagerInterface $entityManager
-    ): Response {
-        if (!$this->isCsrfTokenValid('restaurar' . $producto->getId(), $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Token inválido');
-            return $this->redirectToRoute('app_productos_show', ['id' => $producto->getId()]);
-        }
-
-        $conn = $entityManager->getConnection();
-        $historial = $conn->fetchAssociative(
-            'SELECT * FROM productos_historial WHERE id = :id AND producto_id = :producto_id',
-            ['id' => $historialId, 'producto_id' => $producto->getId()]
-        );
-
-        if (!$historial) {
-            throw $this->createNotFoundException('Versión no encontrada para este producto');
-        }
-
-        $producto->setNombre($historial['nombre']);
-        $producto->setDescripcion($historial['descripcion']);
-        $producto->setPrecio((string)($historial['precio'] ?? '0'));
-        $producto->setPrecioCosto($historial['precio_costo'] !== null ? (string)$historial['precio_costo'] : null);
-        $producto->setStock((string)($historial['stock'] ?? '0'));
-        $producto->setImagen($historial['imagen']);
-        $producto->setActivo((bool)($historial['activo'] ?? false));
-        $producto->setCodigoBarra($historial['codigo_barra']);
-
-        if (!empty($historial['categoria_id'])) {
-            $categoria = $entityManager->getRepository(Categoria::class)->find($historial['categoria_id']);
-            $producto->setCategoria($categoria);
-        } else {
-            $producto->setCategoria(null);
-        }
-
-        $entityManager->flush();
-
-        $this->addFlash('success', 'Producto restaurado a la versión del ' . $historial['created_at']);
-        return $this->redirectToRoute('app_productos_show', ['id' => $producto->getId()]);
     }
 
     #[Route(name: 'app_productos_index', methods: ['GET'])]

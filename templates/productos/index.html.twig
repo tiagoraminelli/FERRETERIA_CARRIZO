@@ -20,27 +20,21 @@
 
         <div class="d-flex gap-2">
           {# Exportar a PDF / Imprimir #}
+
           <a href="{{ path('app_productos_export_pdf') }}?search={{ search }}&categoria={{ categoriaId }}" target="_blank" class="btn btn-outline-secondary rounded-0 px-4 py-2" title="Imprimir / Guardar PDF"><i class="bi bi-printer"></i> Imprimir</a>
-
-          {# Importar Excel #}
-          <a href="{{ path('app_productos_import') }}" class="btn btn-outline-secondary rounded-0 px-4 py-2">
-            <i class="bi bi-file-earmark-excel"></i>
-            Importar Excel
-          </a>
-
           {# Edición Masiva #}
+
           <a href="{{ path('app_productos_bulk_update') }}" class="btn btn-outline-secondary rounded-0 px-4 py-2">
             <i class="bi bi-pencil-square"></i>
             Edición Masiva
           </a>
-
           {# Nuevo Producto #}
+
           <a href="{{ path('app_productos_new') }}" class="btn btn-dark rounded-0 px-4 py-2">
             <i class="bi bi-plus-lg"></i>
             Nuevo Producto
           </a>
         </div>
-        
       </div>
 
       <div class="card border-0 rounded-0 shadow-sm">
@@ -48,7 +42,7 @@
           <form method="GET" action="{{ path('app_productos_index') }}">
             <div class="row g-2 align-items-center">
               <div class="col">
-                <input type="text" name="search" value="{{ search }}" class="form-control form-control-lg rounded-0 border-secondary shadow-none" placeholder="Buscar por nombre o descripción..."/>
+                <input type="text" name="search" value="{{ search }}" class="form-control form-control-lg rounded-0 border-secondary shadow-none" placeholder="Buscar por nombre o descripción..." />
               </div>
 
               <div class="col-md-3">
