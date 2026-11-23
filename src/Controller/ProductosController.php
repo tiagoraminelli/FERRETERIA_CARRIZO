@@ -519,13 +519,33 @@ final class ProductosController extends AbstractController
     #[Route('/{id}/edit', name: 'app_productos_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Productos $producto, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-        // Guardar imagen actual para comparar después
+        // Guardar valores actuales para comparar después
         $imagenActual = $producto->getImagen();
+        $ivaAnterior = $producto->getIva();
+        $codigoBarraAnterior = $producto->getCodigoBarra();
 
         $form = $this->createForm(ProductosType::class, $producto);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // --- CONSERVAR IVA SI NO SE SELECCIONA ---
+            if ($producto->getIva() === null || $producto->getIva() === '') {
+                $producto->setIva($ivaAnterior);
+            }
+            // ----------------------------------------
+
+            // --- CONSERVAR O REGENERAR CÓDIGO DE BARRAS SI QUEDA NULO/VACÍO ---
+            if ($producto->getCodigoBarra() === null || $producto->getCodigoBarra() === '') {
+                if ($codigoBarraAnterior !== null && $codigoBarraAnterior !== '') {
+                    $producto->setCodigoBarra($codigoBarraAnterior);
+                } else {
+                    $categoriaId = $producto->getCategoria() ? $producto->getCategoria()->getId() : 0;
+                    $codigoBarra = str_pad($categoriaId, 3, '0', STR_PAD_LEFT) . str_pad($producto->getId(), 9, '0', STR_PAD_LEFT);
+                    $producto->setCodigoBarra($codigoBarra);
+                }
+            }
+            // -----------------------------------------------------------------
 
             // --- LÓGICA DE PRECIO DE VENTA ---
             $checkManual = $request->request->get('precio_manual'); // <-- NUEVO
@@ -593,7 +613,7 @@ final class ProductosController extends AbstractController
 
             $this->addFlash('success', 'Producto actualizado correctamente');
 
-            return $this->redirectToRoute('app_productos_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_productos_show', ['id' => $producto->getId()], Response::HTTP_SEE_OTHER);
         }
 
         $breadcrumbs = [

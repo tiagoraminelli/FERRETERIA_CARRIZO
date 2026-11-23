@@ -5,8 +5,6 @@ namespace App\Entity;
 use App\Repository\ProductosRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping\PrePersist;
-use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -45,6 +43,11 @@ class Productos
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $codigo_barra = null;
+
+    // --- NUEVO CAMPO IVA ---
+    #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2, nullable: true)]
+    private ?string $iva = null;
+    // -----------------------
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $created_at = null;
@@ -177,6 +180,19 @@ class Productos
         return $this;
     }
 
+    // --- GETTER Y SETTER DE IVA ---
+    public function getIva(): ?string
+    {
+        return $this->iva;
+    }
+
+    public function setIva(?string $iva): static
+    {
+        $this->iva = $iva;
+        return $this;
+    }
+    // ------------------------------
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->created_at;
@@ -255,13 +271,12 @@ class Productos
         return $this;
     }
 
-        #[ORM\PrePersist]
+    #[ORM\PrePersist]
     public function setCreatedAtValue(): void
     {
         if ($this->created_at === null) {
             $this->created_at = new \DateTimeImmutable();
         }
-        // Al crear, también seteamos el updated_at
         $this->updated_at = new \DateTimeImmutable();
     }
 

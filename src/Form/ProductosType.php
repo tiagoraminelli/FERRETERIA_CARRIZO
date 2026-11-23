@@ -7,6 +7,7 @@ use App\Entity\Categoria;
 use App\Entity\Proveedores;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -35,6 +36,20 @@ class ProductosType extends AbstractType
                     'placeholder' => '0.00',
                 ],
             ])
+
+            // --- NUEVO CAMPO IVA ---
+            ->add('iva', ChoiceType::class, [
+                'label' => 'IVA (%)',
+                'required' => false,
+                'choices' => [
+                    '0%' => '0',
+                    '10.5%' => '10.5',
+                    '21%' => '21',
+                    '27%' => '27',
+                ],
+                'placeholder' => 'Seleccione una alícuota',
+            ])
+            // -----------------------
 
             // --- NUEVO CAMPO PORCENTAJE ---
             ->add('porcentaje_ganancia', NumberType::class, [

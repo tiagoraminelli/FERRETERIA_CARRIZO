@@ -45,6 +45,16 @@
             <div class="text-danger small mt-1">{{ form_errors(form.precio_costo) }}</div>
           </div>
 
+          {# --- NUEVO CAMPO IVA --- #}
+          <div class="mb-4">
+            {{ form_label(form.iva, null, { label_attr: { class: 'form-label fw-semibold text-dark small text-uppercase' } }) }}
+
+            {{ form_widget(form.iva, { attr: { class: 'form-select form-select-lg rounded-0 border-secondary shadow-none' } }) }}
+
+            <div class="text-danger small mt-1">{{ form_errors(form.iva) }}</div>
+          </div>
+          {# ----------------------- #}
+
           {# --- NUEVO CAMPO PORCENTAJE --- #}
           <div class="mb-4" id="bloque-porcentaje">
             {{ form_label(form.porcentaje_ganancia, null, { label_attr: { class: 'form-label fw-semibold text-dark small text-uppercase' } }) }}
