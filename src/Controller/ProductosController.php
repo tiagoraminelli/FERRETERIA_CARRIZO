@@ -425,6 +425,28 @@ final class ProductosController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            // --- LÓGICA DE PRECIO DE VENTA ---
+            $checkManual = $request->request->get('precio_manual');
+            $porcentaje = $request->request->all('productos')['porcentaje_ganancia'] ?? null;
+            $precioManual = $request->request->all('productos')['precio'] ?? null;
+            $precioCosto = $producto->getPrecioCosto();
+
+            if (!$checkManual) {
+                // Si NO está tildado el check, ignoramos el precio manual
+                $precioManual = null;
+            }
+
+            if ($precioManual !== null && $precioManual !== '') {
+                $producto->setPrecio($precioManual);
+            } elseif ($porcentaje !== null && $porcentaje !== '') {
+                $costo = floatval($precioCosto);
+                $nuevoPrecio = $costo + ($costo * (floatval($porcentaje) / 100));
+                $producto->setPrecio((string)$nuevoPrecio);
+            } else {
+                $producto->setPrecio($precioCosto ?? '0');
+            }
+            // ---------------------------------
+
             # Subir imagen
             $imagenFile = $form->get('imagen')->getData();
 
