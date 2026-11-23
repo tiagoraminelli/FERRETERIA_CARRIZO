@@ -97,7 +97,38 @@
 
 					</div>
 
+					{# --- NUEVO CAMPO PORCENTAJE --- #}
+					<div class="mb-4" id="bloque-porcentaje">
+						{{ form_label(form.porcentaje_ganancia, null, {
+                            'label_attr': {
+                                'class': 'form-label fw-semibold text-dark small text-uppercase'
+                            }
+                        }) }}
+
+						{{ form_widget(form.porcentaje_ganancia, {
+                            'attr': {
+                                'class': 'form-control form-control-lg rounded-0 border-secondary shadow-none',
+                                'placeholder': 'Ej: 30'
+                            }
+                        }) }}
+
+						<div class="form-text text-muted small mt-1">
+							Se aplica sobre el Precio Costo para calcular el de Venta.
+						</div>
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.porcentaje_ganancia) }}
+						</div>
+					</div>
+					{# ------------------------------ #}
+
 					<div class="mb-4">
+						<div class="form-check mb-2">
+							<input class="form-check-input rounded-0 shadow-none" type="checkbox" id="check_precio_manual" name="precio_manual" {% if producto.precio is not null %}checked{% endif %}>
+							<label class="form-check-label text-dark fw-semibold small text-uppercase" for="check_precio_manual">
+								Establecer Precio de Venta Manual
+							</label>
+						</div>
 
 						{{ form_label(form.precio, null, {
                         'label_attr': {
@@ -159,6 +190,33 @@
 
 					</div>
 
+					{# --- BLOQUE DE PROVEEDORES --- #}
+					<div class="mb-4">
+
+						{{ form_label(form.proveedores, null, {
+                        'label_attr': {
+                            'class': 'form-label fw-semibold text-dark small text-uppercase'
+                        }
+                    }) }}
+
+						{{ form_widget(form.proveedores, {
+                        'attr': {
+                            'class': 'form-select form-select-lg rounded-0 border-secondary shadow-none',
+                            'size': 5
+                        }
+                    }) }}
+
+						<div class="text-danger small mt-1">
+							{{ form_errors(form.proveedores) }}
+						</div>
+
+						<div class="form-text text-muted small mt-1">
+							Mantené presionada la tecla <kbd>Ctrl</kbd> (o <kbd>Cmd</kbd> en Mac) para seleccionar varios proveedores.
+						</div>
+
+					</div>
+					{# ----------------------------- #}
+
 					<div class="mb-4">
 
 						<div class="form-check">
@@ -207,5 +265,34 @@
 		</div>
 
 	</div>
+
+	{# --- SCRIPT PARA HABILITAR/DESHABILITAR CAMPOS --- #}
+	<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			const checkManual = document.getElementById('check_precio_manual');
+			const precioInput = document.getElementById('productos_precio');
+			const porcentajeInput = document.getElementById('productos_porcentaje_ganancia');
+
+			function togglePrecio() {
+				if (checkManual.checked) {
+					precioInput.disabled = false;
+					precioInput.required = true;
+					porcentajeInput.disabled = true;
+					porcentajeInput.value = ''; // Limpiamos el %
+				} else {
+					precioInput.disabled = true;
+					precioInput.required = false;
+					precioInput.value = ''; // Limpiamos el precio
+					porcentajeInput.disabled = false;
+				}
+			}
+
+			// Ejecutar al cargar la página
+			togglePrecio();
+
+			// Escuchar el cambio del checkbox
+			checkManual.addEventListener('change', togglePrecio);
+		});
+	</script>
 
 {% endblock %}

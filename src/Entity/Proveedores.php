@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProveedoresRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -56,6 +58,17 @@ class Proveedores
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $updated_at = null;
+
+    /**
+     * @var Collection<int, Productos>
+     */
+    #[ORM\ManyToMany(targetEntity: Productos::class, mappedBy: 'proveedores')]
+    private Collection $productos;
+
+    public function __construct()
+    {
+        $this->productos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -213,6 +226,33 @@ class Proveedores
     public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Productos>
+     */
+    public function getProductos(): Collection
+    {
+        return $this->productos;
+    }
+
+    public function addProducto(Productos $producto): static
+    {
+        if (!$this->productos->contains($producto)) {
+            $this->productos->add($producto);
+            $producto->addProveedor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProducto(Productos $producto): static
+    {
+        if ($this->productos->removeElement($producto)) {
+            $producto->removeProveedor($this);
+        }
+
         return $this;
     }
 }

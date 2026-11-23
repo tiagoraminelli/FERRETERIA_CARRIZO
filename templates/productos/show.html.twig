@@ -119,6 +119,27 @@
                                 </div>
                             </div>
 
+                            {# --- NUEVO BLOQUE DE PROVEEDORES --- #}
+                            <div class="mb-3">
+                                <label class="fw-semibold text-dark small text-uppercase">Proveedores</label>
+                                {% if producto.proveedores is empty %}
+                                    <p class="fw-light text-muted mb-0">No tiene proveedores asignados.</p>
+                                {% else %}
+                                    <ul class="list-unstyled fw-light mb-0 mt-1">
+                                        {% for proveedor in producto.proveedores %}
+                                            <li>
+                                                <i class="bi bi-truck text-secondary"></i>
+                                                {{ proveedor.nombre }}
+                                                {% if proveedor.telefono %}
+                                                    <span class="text-muted small">(Tel: {{ proveedor.telefono }})</span>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            {# --- FIN NUEVO BLOQUE --- #}
+
                             <div class="row">
                                 <div class="col-md-4 mb-3">
                                     <label class="fw-semibold text-dark small text-uppercase">Precio Costo</label>

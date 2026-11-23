@@ -497,7 +497,6 @@ final class ProductosController extends AbstractController
     #[Route('/{id}/edit', name: 'app_productos_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Productos $producto, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
-
         // Guardar imagen actual para comparar después
         $imagenActual = $producto->getImagen();
 
@@ -505,6 +504,30 @@ final class ProductosController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            // --- LÓGICA DE PRECIO DE VENTA ---
+            $checkManual = $request->request->get('precio_manual'); // <-- NUEVO
+            $porcentaje = $request->request->all('productos')['porcentaje_ganancia'] ?? null;
+            $precioManual = $request->request->all('productos')['precio'] ?? null;
+            $precioCosto = $producto->getPrecioCosto();
+
+            if (!$checkManual) {
+                // Si NO está tildado el check, ignoramos el precio manual y calculamos por %
+                $precioManual = null;
+            }
+
+            if ($precioManual !== null && $precioManual !== '') {
+                $producto->setPrecio($precioManual);
+            } elseif ($porcentaje !== null && $porcentaje !== '') {
+                $costo = floatval($precioCosto);
+                $nuevoPrecio = $costo + ($costo * (floatval($porcentaje) / 100));
+                $producto->setPrecio((string)$nuevoPrecio);
+            } else {
+                if ($producto->getPrecio() === null) {
+                    $producto->setPrecio('0');
+                }
+            }
+            // ---------------------------------
 
             // Subir nueva imagen
             $imagenFile = $form->get('imagen')->getData();

@@ -1,4 +1,3 @@
-
 # COMANDOS ÚTILES PARA SYMFONY 7
 
 ---
@@ -52,7 +51,7 @@ php bin/console make:entity Proveedores
 Ejemplo de campos:
 
 ```text
-nombre (string, length=150, nullable=false)
+nombre (string, length=150, nullable=falrverse)
 razon_social (string, length=200, nullable=true)
 cuit (string, length=20, nullable=true)
 telefono (string, length=50, nullable=true)

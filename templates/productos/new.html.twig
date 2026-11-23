@@ -69,6 +69,20 @@
             <div class="text-danger small mt-1">{{ form_errors(form.categoria) }}</div>
           </div>
 
+          {# --- NUEVO BLOQUE DE PROVEEDORES --- #}
+          <div class="mb-4">
+            {{ form_label(form.proveedores, null, { label_attr: { class: 'form-label fw-semibold text-dark small text-uppercase' } }) }}
+
+            {{ form_widget(form.proveedores, { attr: { class: 'form-select form-select-lg rounded-0 border-secondary shadow-none', size: 5 } }) }}
+
+            <div class="text-danger small mt-1">{{ form_errors(form.proveedores) }}</div>
+
+            <div class="form-text text-muted small mt-1">
+              Mantené presionada la tecla <kbd>Ctrl</kbd> (o <kbd>Cmd</kbd> en Mac) para seleccionar varios proveedores.
+            </div>
+          </div>
+          {# --- FIN NUEVO BLOQUE --- #}
+
           <div class="mb-4">
             {{ form_label(form.imagen, null, { label_attr: { class: 'form-label fw-semibold text-dark small text-uppercase' } }) }}
 

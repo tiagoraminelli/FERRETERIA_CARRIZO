@@ -5,10 +5,13 @@ namespace App\Entity;
 use App\Repository\ProductosRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping\PrePersist;
+use Doctrine\ORM\Mapping\PreUpdate;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductosRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Productos
 {
     #[ORM\Id]
@@ -55,9 +58,19 @@ class Productos
     #[ORM\OneToMany(targetEntity: PresupuestosDetalle::class, mappedBy: 'producto')]
     private Collection $presupuestosDetalles;
 
+    /**
+     * @var Collection<int, Proveedores>
+     */
+    #[ORM\ManyToMany(targetEntity: Proveedores::class, inversedBy: 'productos')]
+    #[ORM\JoinTable(name: 'productos_proveedores')]
+    #[ORM\JoinColumn(name: 'producto_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'proveedor_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Collection $proveedores;
+
     public function __construct()
     {
         $this->presupuestosDetalles = new ArrayCollection();
+        $this->proveedores = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -92,7 +105,7 @@ class Productos
         return $this->precio;
     }
 
-    public function setPrecio(string $precio): static
+    public function setPrecio(?string $precio): static
     {
         $this->precio = $precio;
         return $this;
@@ -213,5 +226,48 @@ class Productos
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Proveedores>
+     */
+    public function getProveedores(): Collection
+    {
+        return $this->proveedores;
+    }
+
+    public function addProveedor(Proveedores $proveedor): static
+    {
+        if (!$this->proveedores->contains($proveedor)) {
+            $this->proveedores->add($proveedor);
+            $proveedor->addProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProveedor(Proveedores $proveedor): static
+    {
+        if ($this->proveedores->removeElement($proveedor)) {
+            $proveedor->removeProducto($this);
+        }
+
+        return $this;
+    }
+
+        #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        if ($this->created_at === null) {
+            $this->created_at = new \DateTimeImmutable();
+        }
+        // Al crear, también seteamos el updated_at
+        $this->updated_at = new \DateTimeImmutable();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updated_at = new \DateTimeImmutable();
     }
 }

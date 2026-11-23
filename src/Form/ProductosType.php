@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\Productos;
 use App\Entity\Categoria;
+use App\Entity\Proveedores;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -26,7 +27,6 @@ class ProductosType extends AbstractType
                 'label' => 'Descripción',
                 'required' => false,
             ])
-
             ->add('precio_costo', NumberType::class, [
                 'label' => 'Precio Costo',
                 'required' => false,
@@ -36,9 +36,24 @@ class ProductosType extends AbstractType
                 ],
             ])
 
+            // --- NUEVO CAMPO PORCENTAJE ---
+            ->add('porcentaje_ganancia', NumberType::class, [
+                'label' => 'Porcentaje de Ganancia (%)',
+                'mapped' => false, // No está en la entidad
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Ej: 30',
+                ],
+            ])
+            // ------------------------------
 
             ->add('precio', NumberType::class, [
-                'label' => 'Precio',
+                'label' => 'Precio de Venta (Opcional)',
+                'required' => false, // <-- AHORA ES OPCIONAL
+                'attr' => [
+                    'step' => '0.01',
+                    'placeholder' => '0.00',
+                ],
             ])
             ->add('stock', NumberType::class, [
                 'label' => 'Stock',
@@ -48,6 +63,19 @@ class ProductosType extends AbstractType
                 'choice_label' => 'nombre',
                 'label' => 'Categoría',
                 'placeholder' => 'Seleccione una categoría',
+            ])
+            ->add('proveedores', EntityType::class, [
+                'class' => Proveedores::class,
+                'choice_label' => 'nombre',
+                'label' => 'Proveedores',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+                'by_reference' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'size' => 5,
+                ]
             ])
             ->add('imagen', FileType::class, [
                 'label' => 'Imagen',
